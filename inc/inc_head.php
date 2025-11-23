@@ -7,3 +7,4 @@ require_once __DIR__ . '/../inc/inc_auth.php'; ?>
 <link rel="stylesheet" href="<?= CSS_URL ?>/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
