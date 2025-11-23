@@ -184,31 +184,6 @@ body {
 }
 
 
-.logout-btn {
-  background: var(--error);
-  color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.logout-btn:not(:disabled):hover {
-  background: #dc2626;
-}
-
-.logout-btn:disabled,
-.logout-btn[disabled] {
-  background: #bdbdbd;
-  color: #888;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
 .search-container {
   position: relative;
   width: 400px;

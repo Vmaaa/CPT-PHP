@@ -74,7 +74,7 @@ mysqli_stmt_close($stGet);
 if (!$curr) {
     mysqli_rollback($DB_T);
     http_response_code(404);
-    echo json_encode(['error' => 'Cuenta no encontrada']);
+    echo json_encode(['error' => 'Cuenta no encontrada', 'acco_id' => $acco_id]);
     exit;
 }
 

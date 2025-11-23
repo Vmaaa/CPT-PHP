@@ -5,7 +5,7 @@ require_once __DIR__ . '/../utils/token/validate.php';
 
 function current_user_or_redirect(): array {
     if (empty($_COOKIE['jwt']) && basename($_SERVER['PHP_SELF']) !== 'change_password.php') {
-        header("Location: /index.php", true, 302);
+        header("Location: " . url("/index.php"), true, 302);
         exit;
     }
 
@@ -27,7 +27,7 @@ function current_user_or_redirect(): array {
             $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? '; Secure' : '';
             header('Set-Cookie: jwt=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; SameSite=Strict' . $secure);
         }
-        header("Location: /index.php", true, 302);
+        header("Location: " . url("/index.php"), true, 302);
         exit;
       }
     }
@@ -37,10 +37,9 @@ function current_user_or_redirect(): array {
 function role_human_readable(string $role): string {
     return match ($role) {
         'admin' => 'Administrador',
-        'agent' => 'Agente',
-        'supervisor' => 'Supervisor Externo',
-        'supervisor_intra' => 'Supervisor Interno',
-        'system_admin' => 'Administrador del Sistema',
+        'student' => 'Estudiante',
+        'professor' => 'Profesor',
+        'advisor' => 'Asesor',
         default => 'Desconocido',
     };
 }
@@ -58,11 +57,12 @@ if (in_array(basename($_SERVER['PHP_SELF']), $ignored_pages)) {
 $AUTH = current_user_or_redirect();
 if (isset($AUTH['acco_status']) && $AUTH['acco_status'] !== 1 && basename($_SERVER['PHP_SELF']) !== 'change_password.php') {
   header("Location: /index.php?show_alert=true", true, 302);
+  header("Location: " . url("/index.php?show_alert=true"), true, 302);
   exit;
 }
 
 if(isset($AUTH['first_login']) && $AUTH['first_login'] === 1 && basename($_SERVER['PHP_SELF']) !== 'change_password.php') {
-    header("Location: /pages/change_password.php?show_alert=true", true, 302);
+  header("Location: " . url("/pages/change_password.php?show_alert=true"), true, 302);
     exit;
 }
 

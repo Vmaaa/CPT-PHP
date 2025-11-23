@@ -2,25 +2,27 @@
 $role = $AUTH['acco_role'];
 $activePage = $activePage ?? '';
 
-$dashboardModule = [ 'DASHBOARD' => ['url' => 'pages/dashboard.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard'] ];
-$agentModule  = [ 'AGENTE'  => ['url' => 'pages/agent.php', 'icon' => 'fas fa-headset', 'label' => 'Agentes'] ];
-$agentServiceModule  = [ 'SERVICIO_AGENTE'  => ['url' => 'pages/agent_service.php', 'icon' => 'fas fa-headset', 'label' => 'Agente'] ];
+$dashboardModuleAdmin = [ 'DASHBOARD' => ['url' => 'pages/dashboard.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard'] ];
+$dashboardModuleProfessor = [ 'DASHBOARD' => ['url' => 'pages/dashboard_professor.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard'] ];
+$dashboardModuleStudent = [ 'DASHBOARD' => ['url' => 'pages/dashboard_student.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard'] ];
+$advisedModule   = [ 'ASESORADOS' => ['url' => 'pages/advised.php',  'icon' => 'fas fa-user-friends',   'label' => 'Asesorados'] ];
+$revisionModule  = [ 'REVISIONES' => ['url' => 'pages/revisions.php', 'icon' => 'fas fa-check-double',   'label' => 'Revisiones'] ];
+$projectModuleProfessor   = [ 'PROYECTOS'  => ['url' => 'pages/projects.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyectos'] ];
+$projectModuleStudent = [ 'PROYECTO'  => ['url' => 'pages/projects_student.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyecto'] ];
+$classModuleAdmin        = [ 'CLASES'     => ['url' => 'pages/classes_admin.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases'] ];
+$classModuleProfessor     = [ 'CLASES'     => ['url' => 'pages/classes.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases'] ];
+$classModuleStudent       = [ 'CLASES'     => ['url' => 'pages/classes_student.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases'] ];
 
-$clientModule = [ 'CONTACTOS' => ['url' => 'pages/contact.php', 'icon' => 'fas fa-users',     'label' => 'Clientes'] ];
-$callModule   = [ 'LLAMADAS' => ['url' => 'pages/call.php',   'icon' => 'fas fa-phone-alt', 'label' => 'Llamadas'] ];
-$productModule = [ 'PRODUCTOS' => ['url' => 'pages/product.php', 'icon' => 'fas fa-boxes', 'label' => 'Productos'] ];
-$saleModule   = [ 'VENTAS'   => ['url' => 'pages/sale.php',   'icon' => 'fas fa-shopping-cart', 'label' => 'Ventas'] ];
-$metricModule = [ 'METRICAS' => ['url' => 'pages/metric.php', 'icon' => 'fas fa-chart-line',    'label' => 'Métricas'] ];
-$auditModule = [ 'AUDITORIA' => ['url' => 'pages/audit.php', 'icon' => 'fas fa-file-pen',    'label' => 'Auditoría'] ];
 
 $userModule   = [ 'USUARIOS' => ['url' => 'pages/user.php',   'icon' => 'fas fa-user-cog',      'label' => 'Usuarios'] ];
+$accountModule = [ 'CUENTA'    => ['url' => 'pages/account.php', 'icon' => 'fas fa-user-circle',   'label' => 'Mi Cuenta'] ];
+$logoutModule  = [ 'CERRAR_SESION' => ['icon' => 'fas fa-sign-out-alt',  'label' => 'Cerrar Sesión'] ];
 
 $rolePermissions = [
-    'system_admin' => array_merge($dashboardModule, $agentModule, $clientModule, $callModule, $productModule, $saleModule, $metricModule, $auditModule, $userModule),
-    'admin' => array_merge($dashboardModule, $agentModule, $clientModule, $callModule, $productModule, $saleModule, $metricModule, $auditModule, $userModule),
-    'supervisor'   => array_merge($dashboardModule, $metricModule),
-    'supervisor_intra'  => array_merge($dashboardModule, $agentModule, $metricModule, $metricModule, $saleModule, $auditModule),
-    'agent'      => array_merge($dashboardModule, $agentServiceModule),
+    'admin' => array_merge($dashboardModuleAdmin, $advisedModule, $revisionModule, $projectModuleProfessor, $classModuleAdmin, $userModule, $accountModule),
+    'student' => array_merge($dashboardModuleStudent, $projectModuleStudent, $classModuleStudent, $accountModule),
+    'professor' => array_merge($dashboardModuleProfessor, $revisionModule, $projectModuleProfessor, $classModuleProfessor, $accountModule),
+    'advisor'=> array_merge($dashboardModuleProfessor, $advisedModule, $projectModuleProfessor, $classModuleProfessor, $accountModule),
 ];
 
 $allowedModules = $rolePermissions[$role] ?? [];
@@ -35,5 +37,10 @@ $allowedModules = $rolePermissions[$role] ?? [];
                 <span><?= $module['label'] ?></span>
             </a>
         <?php endforeach; ?>
-    </div>
+    <!-- Logout Link -->
+   <a href="#" class="nav-item" id="logout-btn">
+        <i class="<?= $logoutModule['CERRAR_SESION']['icon'] ?> nav-icon"></i>
+        <span><?= $logoutModule['CERRAR_SESION']['label'] ?></span>
+    </button>
+    </a>
 </nav>

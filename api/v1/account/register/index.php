@@ -126,15 +126,10 @@ try {
     mysqli_stmt_close($stmt_insert);
     mysqli_rollback($DB_T);
     releaseLock($DB_T, $lockEmailKey);
-    if ($e->getCode() === 1452) {
-        http_response_code(400);
-        echo json_encode(['error' => 'El agente asociado no existe']);
-        return;
-    } else {
-        http_response_code(500);
-        echo json_encode(['error' => 'Error al insertar el nuevo usuario']);
-        return;
-    }
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al insertar el nuevo usuario']);
+    return;
+    
 }
 
 mysqli_stmt_close($stmt_insert);
@@ -152,5 +147,5 @@ mysqli_commit($DB_T);
 releaseLock($DB_T, $lockEmailKey);
 
 http_response_code(201);
-echo json_encode(['success' => true, 'created' => $acco_id]);
+echo json_encode(['success' => true, 'created' => $acco_id, 'strontg_password' => $plain_password]);
 

@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
           { method: "POST", body: formData },
         );
         const data = await response.json();
-        console.log(data);
         if (response.ok && data.success) {
           window.location.href = `${
             window.APP_BASE_URL || ""
