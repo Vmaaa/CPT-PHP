@@ -41,3 +41,26 @@ function gen_strong_password(int $len = 12): string
     }
     return str_shuffle($pwd);
 }
+
+function  fnt_validateRequiredParams(array $required, array $data): array {
+    $missing = [];
+    foreach ($required as $k) {
+        if (!isset($data[$k])) {
+            $missing[] = $k;
+        }
+    }
+    return $missing;
+}
+
+function fnt_validateCURP($curp) {
+    $re = '/^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$/';
+    if (!preg_match($re, $curp, $validado)) {
+        return false; // No coincide el formato
+    }
+    return true;
+}
+
+function  fnt_validateSchoolIDNumber_v001($id_number) {
+  return preg_match('/^(20[2-9][0-9])\d{6}$/', $id_number) === 1;
+}
+
