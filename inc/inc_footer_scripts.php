@@ -7,6 +7,8 @@
 <script src="<?= JS_URL ?>/general.js" defer></script>
 <script src="<?= JS_URL ?>/swal.js" defer></script>
 
-<?php if (!empty($pageScript)): ?>
-    <script src="<?= JS_URL . '/' . basename($pageScript) ?>" defer></script>
-<?php endif; ?>
+<?php
+if (!empty($pageScript)) {
+    echo '<script src="' . JS_URL . '/' . $pageScript . '" defer></script>';
+}
+?>
