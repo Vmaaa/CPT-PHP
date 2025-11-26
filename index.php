@@ -10,7 +10,7 @@ $pageStyle = "pages/login.css";
   <?php
   require_once __DIR__ . '/inc/inc_head.php';
   ?>
-  <title>Iniciar sesión - Sales360</title>
+  <title>Iniciar sesión - CPT</title>
 </head>
 
 <body>
@@ -32,13 +32,13 @@ $pageStyle = "pages/login.css";
           <button id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">
             <i class="fas fa-sign-in-alt"></i> Iniciar sesión
           </button>
-          <p class="extra-link-p"> ¿Olvidaste tu contraseña? <a href="/pages/recovery_password.php">Recupérala</a></p>
-          <p class="extra-link-p"> ¿No tienes cuenta? <a href="/pages/recovery_password.php">Registrate</a></p>
+          <p class="extra-link-p"> ¿Olvidaste tu contraseña? <a href="<?php echo url('/pages/recovery_password.php') ?>">Recupérala aquí</a></p>
+          <p class="extra-link-p"> ¿No tienes cuenta? <a href="<?php echo url('/pages/register.php') ?>">Regístrate aquí</a></p>
         </div>
       </div>
     </div>
     <div class="login-right">
-      <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen UPIIT" class="login-bg-image">
+      <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen edificio UPIIT hecha a mano" class="login-bg-image">
     </div>
   </div>
 
