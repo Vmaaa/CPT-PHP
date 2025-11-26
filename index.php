@@ -1,20 +1,17 @@
 <?php
 require_once __DIR__ . '/config/app.php';
 $pageScript = "index.js";
-$pageStyle = "pages/login.css";
+$pageStyle = "pages/login-register.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <?php
   require_once __DIR__ . '/inc/inc_head.php';
   ?>
   <title>Iniciar sesión - CPT</title>
 </head>
-
 <body>
-
   <div id="login-screen" class="login-container">
     <div class="login-left">
       <div class="login-card">
@@ -41,10 +38,6 @@ $pageStyle = "pages/login.css";
       <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen edificio UPIIT hecha a mano" class="login-bg-image">
     </div>
   </div>
-
-
   <?php require_once __DIR__ . '/inc/inc_footer_scripts.php'  ?>
-
 </body>
-
 </html>

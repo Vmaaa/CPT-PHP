@@ -47,6 +47,7 @@ function role_human_readable(string $role): string {
 $ignored_pages = [
     'index.php',
     'recovery_password.php',
+    'register.php',
 ];
 //change_password.php is handled separately in the function
 
