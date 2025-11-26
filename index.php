@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config/app.php';
 $pageScript = "index.js";
+$pageStyle = "login.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -15,25 +16,29 @@ $pageScript = "index.js";
 <body>
 
   <div id="login-screen" class="login-container">
-    <div class="login-card">
-        <img src="<?= url('/img/logo.png') ?>" alt="Logo" class="login-logo">
-        <p class="login-title">Bienvenido al sistema</p>
-        <p class="login-subtitle">Ingresa tus credenciales</p>
-      <div class="login-body">
-        <div class="form-group">
-          <label for="email">Correo electrónico</label>
-          <input type="text" id="email" class="form-control" placeholder="tu.correo@telat.com">
+    <div class="login-left">
+      <div class="login-card">
+        <p class="login-title">Inicia sesión en tu cuenta</p>
+        <p class="login-subtitle">Ingresa tu correo y contraseña para continuar</p>
+        <div class="login-body">
+          <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input type="text" id="email" class="form-control" placeholder="tu.correo@alumno.ipn.mx">
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" class="form-control" placeholder="Ingresa tu contraseña">
+          </div>
+          <button id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+          </button>
+          <p class="recovery-password"> ¿Olvidaste tu contraseña? <a href="/pages/recovery_password.php" class="main-text-gradient">Recupérala</a></p>
+          <p class="recovery-password"> ¿No tienes cuenta? <a href="/pages/recovery_password.php" class="main-text-gradient">Registrate</a></p>
         </div>
-        <div class="form-group">
-          <label for="password">Contraseña</label>
-          <input type="password" id="password" class="form-control" placeholder="Ingresa tu contraseña">
-        </div>
-        <button id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">
-          <i class="fas fa-sign-in-alt"></i> Ingresar al sistema
-        </button>
-        <p class="recovery-password"> ¿Olvidaste tu contraseña? <a href="/pages/recovery_password.php" class="main-text-gradient">Recupérala</a></p>
       </div>
-      </div>
+    </div>
+    <div class="login-right">
+      <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen UPIIT">
     </div>
   </div>
 
