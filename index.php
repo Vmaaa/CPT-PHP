@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/config/app.php';
 $pageScript = "index.js";
-$pageStyle = "login.css";
+$pageStyle = "pages/login.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
