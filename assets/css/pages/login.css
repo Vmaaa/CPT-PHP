@@ -52,7 +52,7 @@
 
 .extra-link-p a {
   padding-top: 0.5rem;
-  text-decoration: none;
+  text-decoration: underline;
   margin-top: 1rem;
   display: inline-block;
 }
