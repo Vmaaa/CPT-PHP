@@ -22,6 +22,12 @@
   justify-content: center;
 }
 
+.login-right .login-bg-image {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+
 .login-card {
   background: none;
   border-radius: var(--radius);

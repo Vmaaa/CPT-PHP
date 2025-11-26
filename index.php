@@ -38,7 +38,7 @@ $pageStyle = "pages/login.css";
       </div>
     </div>
     <div class="login-right">
-      <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen UPIIT">
+      <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen UPIIT" class="login-bg-image">
     </div>
   </div>
 
