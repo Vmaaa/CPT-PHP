@@ -29,7 +29,6 @@ $allowedModules = $rolePermissions[$role] ?? [];
 ?>
 
 <nav class="sidebar">
-        <img src="<?= url('/img/logo_white.png') ?>" alt="Logo" class="sidebar-logo"> 
     <div class="nav-links">
         <?php foreach ($allowedModules as $pageKey => $module): ?>
             <a href="<?= url($module['url']) ?>" class="nav-item <?= $activePage === $pageKey ? 'active' : '' ?>" data-page="<?= strtolower(str_replace(' ', '-', $module['label'])) ?>">

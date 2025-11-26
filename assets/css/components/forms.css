@@ -27,7 +27,7 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: var(--text-primary);

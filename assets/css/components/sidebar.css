@@ -1,6 +1,6 @@
 .sidebar {
   grid-area: sidebar;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary);
   padding: 2rem 0;
   position: sticky;
   top: 0;
@@ -15,7 +15,6 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--success), var(--warning));
 }
 
 .sidebar-logo {
@@ -25,11 +24,6 @@
   margin-bottom: 2rem;
 }
 
-.login-logo {
-  width: 80%;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
 
 .nav-item {
   display: flex;
