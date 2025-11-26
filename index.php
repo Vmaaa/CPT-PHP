@@ -32,8 +32,8 @@ $pageStyle = "pages/login.css";
           <button id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">
             <i class="fas fa-sign-in-alt"></i> Iniciar sesión
           </button>
-          <p class="recovery-password"> ¿Olvidaste tu contraseña? <a href="/pages/recovery_password.php" class="main-text-gradient">Recupérala</a></p>
-          <p class="recovery-password"> ¿No tienes cuenta? <a href="/pages/recovery_password.php" class="main-text-gradient">Registrate</a></p>
+          <p class="extra-link-p"> ¿Olvidaste tu contraseña? <a href="/pages/recovery_password.php">Recupérala</a></p>
+          <p class="extra-link-p"> ¿No tienes cuenta? <a href="/pages/recovery_password.php">Registrate</a></p>
         </div>
       </div>
     </div>
