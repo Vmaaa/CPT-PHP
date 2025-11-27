@@ -16,8 +16,6 @@ $pageScript = "dashboard.js";
     <div id="app-container" class="app-container">
         <?php require_once __DIR__ . '/../inc/inc_sidebar.php'; ?>
         <div class="main-content">
-            <?php require_once __DIR__ . '/../inc/inc_topbar.php'; ?>
-        
             <main class="main-content">
                 <div id="dashboard" class="page active">
                     <div style="margin-bottom: 2rem;">
