@@ -34,7 +34,9 @@ if (recoveryBtn && emailInput) {
             "Se envió un correo al correo asociado a tu cuenta, sigue los pasos para cambiar de contraseña",
           icon: "success",
         });
-        window.location.href = `${window.APP_BASE_URL}/pages/dashboard.php`;
+        setTimeout(() => {
+          window.location.href = `${window.APP_BASE_URL}/index.php`;
+        }, 2000);
       } else {
         showMessage({
           title: "Error de recuperación",
