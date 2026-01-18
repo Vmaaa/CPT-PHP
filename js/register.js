@@ -1,3 +1,5 @@
+CAREER_API = API_URL + "/career/";
+
 document.addEventListener("DOMContentLoaded", function () {
   const emailInput = document.getElementById("email");
   const userTypeText = document.getElementById("user-type-text");
@@ -23,24 +25,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function fetchCarreras() {
+  async function fetchCarreras() {
     carreraSelect.innerHTML = '<option value="">Cargando carreras...</option>';
-    fetch("/api/carreras")
-      .then((res) => res.json())
-      .then((data) => {
-        carreraSelect.innerHTML =
-          '<option value="">Selecciona carrera</option>';
-        data.forEach((carrera) => {
-          const option = document.createElement("option");
-          option.value = carrera.id;
-          option.textContent = carrera.nombre;
-          carreraSelect.appendChild(option);
-        });
-      })
-      .catch(() => {
-        carreraSelect.innerHTML =
-          '<option value="">No se pudieron cargar las carreras</option>';
+    const response = await CookieManager.fetchWithAuth(CAREER_API);
+    if (response.ok) {
+      const response_json = await response.json();
+      const carreras = response_json.data;
+
+      carreraSelect.innerHTML =
+        '<option value="">Selecciona una carrera</option>';
+      carreras.forEach((carrera) => {
+        const option = document.createElement("option");
+        option.value = carrera.id_career;
+        option.textContent = carrera.career;
+        carreraSelect.appendChild(option);
       });
+    } else {
+      carreraSelect.innerHTML =
+        '<option value="">Error al cargar carreras</option>';
+    }
   }
 
   emailInput.addEventListener("blur", updateUserType);

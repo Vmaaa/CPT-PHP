@@ -4,10 +4,10 @@ $docRoot     = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
 $baseUrl     = '';
 
 if ($projectRoot && $docRoot && str_starts_with($projectRoot, $docRoot)) {
-    $baseUrl = rtrim(str_replace($docRoot, '', $projectRoot), '/');
+  $baseUrl = rtrim(str_replace($docRoot, '', $projectRoot), '/');
 } else {
-    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '') ?: '';
-    $baseUrl   = rtrim($scriptDir, '/');
+  $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '') ?: '';
+  $baseUrl   = rtrim($scriptDir, '/');
 }
 
 define('BASE_PATH', $projectRoot ?: __DIR__ . '/..');
@@ -16,8 +16,15 @@ define('BASE_URL',  $baseUrl ?: '');
 define('ASSETS_URL', BASE_URL . '/assets');
 define('CSS_URL',    ASSETS_URL . '/css');
 define('JS_URL',     BASE_URL . '/js');
+define('API_URL',    BASE_URL . '/api/v1');
 
-function url(string $path = ''): string {
-    $path = ltrim($path, '/');
-    return BASE_URL . ($path ? '/' . $path : '');
+function url(string $path = ''): string
+{
+  $path = ltrim($path, '/');
+  return BASE_URL . ($path ? '/' . $path : '');
 }
+?>
+
+<script>
+  const API_URL = '<?php echo API_URL; ?>';
+</script>
