@@ -1,20 +1,22 @@
 <?php
 require_once __DIR__ . '/../config/app.php';
 $pageScript = "recovery_password.js";
-$pageStyle = "pages/recovery_password.css";
+$pageStyle = "pages/password_form.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-    <title>Recuperación de contraseña - CPT</title>
+  <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
+  <title>Recuperación de contraseña - <?php echo $SYSTEM_NAME ?></title>
 </head>
+
 <body>
-<div class="background-image">
+  <div class="background-image">
     <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen edificio UPIIT hecha a mano" class="bg-image">
   </div>
   <div class="center-card-container">
-    <div class="recovery-card">
+    <div class="card">
       <p class="card-title">Recupera tu contraseña</p>
       <p class="card-subtitle">Ingresa tu correo para recibir instrucciones</p>
       <div class="form-group">
@@ -29,4 +31,5 @@ $pageStyle = "pages/recovery_password.css";
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
   <script src="../js/recovery_password.js"></script>
 </body>
+
 </html>

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/app.php';
 $pageScript = "change_password.js";
+$pageStyle = "pages/password_form.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -104,16 +105,16 @@ $pageScript = "change_password.js";
 </head>
 
 <body>
-  <a id="back-btn" title="Volver al inicio de sesión" href="<?= htmlspecialchars(BASE_URL ?: '/pages/') ?>dashboard.php">
-    <i class="fas fa-arrow-left"></i>
-  </a>
-  <div id="change-password-screen" class="login-container">
-    <div class="login-card">
-      <div class="login-header main-text-gradient">
+  <div class="background-image">
+    <img src="<?= url('/img/login-bg.png') ?>" alt="Imagen edificio UPIIT hecha a mano" class="bg-image">
+  </div>
+  <div class="center-card-container">
+    <div class="card">
+      <div class="card-title">
         <h1><i class="fas fa-lock"></i> Cambiar contraseña</h1>
       </div>
 
-      <p class="login-subtitle">Ingresa tu nueva contraseña</p>
+      <p class="card-subtitle">Ingresa tu nueva contraseña</p>
       <div class="login-body">
         <form prevent="submit">
           <div class="form-row vertical">

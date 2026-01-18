@@ -5,12 +5,14 @@ $pageStyle = "pages/login-register.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <?php
   require_once __DIR__ . '/inc/inc_head.php';
   ?>
-  <title>Iniciar sesión - CPT</title>
+  <title>Iniciar sesión - <?php echo $SYSTEM_NAME ?></title>
 </head>
+
 <body>
   <div id="login-screen" class="login-container">
     <div class="login-left">
@@ -40,4 +42,5 @@ $pageStyle = "pages/login-register.css";
   </div>
   <?php require_once __DIR__ . '/inc/inc_footer_scripts.php'  ?>
 </body>
+
 </html>
