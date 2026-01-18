@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../functions/serverSpecifics.php';
+$SS = ServerSpecifics::getInstance();
+$SYSTEM_NAME = $SS->fnt_getSystemName();
 $projectRoot = realpath(__DIR__ . '/..');
 $docRoot     = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
 $baseUrl     = '';
@@ -27,4 +30,5 @@ function url(string $path = ''): string
 
 <script>
   const API_URL = '<?php echo API_URL; ?>';
+  const BASE_URL = '<?php echo BASE_URL; ?>';
 </script>

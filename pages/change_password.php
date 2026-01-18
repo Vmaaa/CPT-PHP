@@ -7,8 +7,12 @@ $pageScript = "change_password.js";
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title>Recuperación de contraseña - Sales360 </title>
-  <script>window.APP_BASE_URL = "<?= htmlspecialchars(BASE_URL ?: '') ?>";</script>
+  <title>Recuperación de contraseña -
+    <?echo $SYSTEM_NAME ?>
+  </title>
+  <script>
+    window.APP_BASE_URL = "<?= htmlspecialchars(BASE_URL ?: '') ?>";
+  </script>
 
   <style>
     .input-wrap {
@@ -99,7 +103,7 @@ $pageScript = "change_password.js";
   </style>
 </head>
 
-<body>  
+<body>
   <a id="back-btn" title="Volver al inicio de sesión" href="<?= htmlspecialchars(BASE_URL ?: '/pages/') ?>dashboard.php">
     <i class="fas fa-arrow-left"></i>
   </a>
@@ -109,7 +113,7 @@ $pageScript = "change_password.js";
         <h1><i class="fas fa-lock"></i> Cambiar contraseña</h1>
       </div>
 
-        <p class="login-subtitle">Ingresa tu nueva contraseña</p>
+      <p class="login-subtitle">Ingresa tu nueva contraseña</p>
       <div class="login-body">
         <form prevent="submit">
           <div class="form-row vertical">
@@ -158,12 +162,13 @@ $pageScript = "change_password.js";
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
 </body>
 <script>
-<?php 
-if (isset($AUTH['acco_name'])) {
-  echo 'const is_logged_in = true;';
-} else {
-  echo 'const is_logged_in = false;';
-}
-?>
+  <?php
+  if (is_array($AUTH) && count($AUTH) > 0) {
+    echo 'const is_logged_in = true;';
+  } else {
+    echo 'const is_logged_in = false;';
+  }
+  ?>
 </script>
+
 </html>

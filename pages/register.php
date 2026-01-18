@@ -5,10 +5,12 @@ $pageStyle = "pages/login-register.css";
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
   <title>Registro - CPT</title>
 </head>
+
 <body>
   <div id="register-screen" class="login-container">
     <div class="login-left">
@@ -55,9 +57,9 @@ $pageStyle = "pages/login-register.css";
               <label for="nivel">Nivel de educación</label>
               <select id="nivel" name="nivel" class="form-control">
                 <option value="">Selecciona nivel</option>
-                <option value="Licenciatura">Licenciatura</option>
-                <option value="Maestría">Maestría</option>
-                <option value="Doctorado">Doctorado</option>
+                <option value="bachelor's">Licenciatura</option>
+                <option value="master's">Maestría</option>
+                <option value="doctorate">Doctorado</option>
               </select>
             </div>
           </div>
@@ -71,4 +73,5 @@ $pageStyle = "pages/login-register.css";
   </div>
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
 </body>
+
 </html>

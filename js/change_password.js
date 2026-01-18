@@ -125,12 +125,13 @@
         showMessage({
           icon: "success",
           title: "Contraseña cambiada",
-          text: "Ahora puedes iniciar sesión.",
+          text:
+            "Ahora puedes iniciar sesión. Serás redirigido a la página de inicio.",
         });
         submitBtn.innerHTML = '<i class="fas fa-save"></i> Contraseña guardada';
         setTimeout(() => {
           window.location.href = `${window.APP_BASE_URL}/index.php?`;
-        }, 3000);
+        }, 2000);
       } else {
         const msg = data.error || "No se pudo cambiar la contraseña.";
         showMessage({
