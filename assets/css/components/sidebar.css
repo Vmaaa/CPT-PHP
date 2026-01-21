@@ -1,11 +1,11 @@
 .sidebar {
-  grid-area: sidebar;
   background: var(--primary);
   padding: 2rem 0;
   position: sticky;
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  max-width: 250px;
 }
 
 .sidebar::before {
@@ -66,4 +66,22 @@
   font-size: 1.2rem;
   width: 20px;
   text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    position: relative;
+    height: auto;
+    padding: 1rem 0;
+    width: 80px;
+  }
+
+  .nav-item {
+    justify-content: center;
+    margin: 0.25rem 0.5rem;
+  }
+
+  .nav-item .nav-text {
+    display: none;
+  }
 }

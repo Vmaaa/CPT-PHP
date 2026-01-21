@@ -1,8 +1,5 @@
 .app-container {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas: "sidebar main";
+  display: flex;
   height: 100vh;
   width: 100%;
   background: var(--bg-primary);
@@ -11,8 +8,8 @@
 }
 
 .main-content {
-  grid-area: main;
   height: 100vh;
+  flex: 1;
   overflow: auto;
   padding: 24px;
   display: flex;
