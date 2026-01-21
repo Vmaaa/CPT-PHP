@@ -33,7 +33,23 @@
   color: white;
 }
 
+
 .btn-warning {
   background: var(--warning);
   color: var(--text-primary);
+}
+
+.btn-error {
+  background: var(--error);
+  color: white;
+}
+
+.btn-success:disabled,
+.btn-primary:disabled,
+.btn-warning:disabled,
+.btn-error:disabled,
+.btn-outline:disabled {
+  background: var(--border);
+  color: var(--text-secondary);
+  cursor: not-allowed;
 }
