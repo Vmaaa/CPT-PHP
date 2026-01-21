@@ -8,6 +8,11 @@ require_once __DIR__ . "/../../../../utils/general.php";
 
 header('Content-Type: application/json');
 
+$SS = ServerSpecifics::getInstance();
+$DB_T = $SS->fnt_getDBConnection();
+$WEBPAGE_T = $SS->fnt_getWebPageURL();
+$SERVER_URL_T = $SS->fnt_getAPIUrl();
+
 function releaseLock($db, $kEmail)
 {
   mysqli_query($db, "SELECT RELEASE_LOCK('" . mysqli_real_escape_string($db, $kEmail) . "')");
@@ -15,13 +20,16 @@ function releaseLock($db, $kEmail)
 
 function fnt_retrieveUserRoleFromEmail_v001($email)
 {
+  $admin_email = "admin@cpt.ipn.mx";
   $studentDomains = ['alumno.ipn.mx'];
   $domain = substr(strrchr($email, "@"), 1);
   if (in_array($domain, $studentDomains, true)) {
     return 'student';
   }
+  if ($email === $admin_email) {
+    return 'admin';
+  }
   return 'professor';
-  // TODO: add extra logic for other roles
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -57,6 +65,15 @@ if (!filter_var($acco_email, FILTER_VALIDATE_EMAIL)) {
 
 $acco_role = fnt_retrieveUserRoleFromEmail_v001($acco_email);
 
+if ($acco_role === 'admin') {
+  $SYSTEM_SECRET = $_POST['system_secret'] ?? '';
+  if ($SYSTEM_SECRET !== $SS->fnt_getSystemSecret()) {
+    http_response_code(403);
+    echo json_encode(['error' => 'No tienes permiso para crear una cuenta de administrador']);
+    exit;
+  }
+}
+
 if (!in_array($acco_status, [0, 1], true)) {
   http_response_code(400);
   echo json_encode(['error' => "El 'acco_status' debe ser 0 o 1"]);
@@ -75,11 +92,6 @@ if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $plain_pas
   echo json_encode(['error' => 'No se pudo generar una contraseña válida, intenta de nuevo.']);
   exit;
 }
-
-$SS = ServerSpecifics::getInstance();
-$DB_T = $SS->fnt_getDBConnection();
-$WEBPAGE_T = $SS->fnt_getWebPageURL();
-$SERVER_URL_T = $SS->fnt_getAPIUrl();
 
 mysqli_begin_transaction($DB_T);
 mysqli_set_charset($DB_T, 'utf8mb4');
@@ -196,17 +208,9 @@ if ($acco_role === 'student') {
     echo json_encode(['error' => 'Parámetros incompletos para perfil de profesor, se requiere ' . implode(', ', $missingProfessorParams)]);
     exit;
   }
-  $is_president = isset($_POST['is_president']) ? (int) $_POST['is_president'] : 0;
   $academia = trim((string) $_POST['academia']);
   $level_of_education = trim((string) $_POST['level_of_education']);
 
-  if (!in_array($is_president, [0, 1], true)) {
-    mysqli_rollback($DB_T);
-    releaseLock($DB_T, $lockEmailKey);
-    http_response_code(400);
-    echo json_encode(['error' => "El 'is_president' debe ser 0 o 1"]);
-    exit;
-  }
   if (!in_array($level_of_education, ['bachelor\'s', 'master\'s', 'doctorate'], true)) {
     mysqli_rollback($DB_T);
     releaseLock($DB_T, $lockEmailKey);
@@ -215,8 +219,8 @@ if ($acco_role === 'student') {
     exit;
   }
 
-  $qry_insert_professor = "INSERT INTO professor (acco_id, name, curp, is_president, academia, level_of_education)
-    VALUES (?, ?, ?, ?, ?, ?)";
+  $qry_insert_professor = "INSERT INTO professor (acco_id, name, curp, academia, level_of_education)
+    VALUES (?, ?, ?, ?, ?)";
   $stmt_insert_professor = mysqli_prepare($DB_T, $qry_insert_professor);
   if (!$stmt_insert_professor) {
     mysqli_rollback($DB_T);
@@ -225,7 +229,7 @@ if ($acco_role === 'student') {
     echo json_encode(['error' => 'Preparación de consulta fallida (insert professor profile)']);
     exit;
   }
-  mysqli_stmt_bind_param($stmt_insert_professor, 'ississ', $acco_id, $acco_name, $curp, $is_president, $academia, $level_of_education);
+  mysqli_stmt_bind_param($stmt_insert_professor, 'issss', $acco_id, $acco_name, $curp, $academia, $level_of_education);
   try {
     mysqli_stmt_execute($stmt_insert_professor);
   } catch (Exception $e) {
@@ -233,7 +237,12 @@ if ($acco_role === 'student') {
     mysqli_rollback($DB_T);
     releaseLock($DB_T, $lockEmailKey);
     http_response_code(500);
-    echo json_encode(['error' => 'Error al insertar el perfil de profesor']);
+    // dupliacate curp
+    if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+      echo json_encode(['error' => 'El CURP proporcionado ya está registrado para otro profesor']);
+    } else {
+      echo json_encode(['error' => 'Error al insertar el perfil de profesor']);
+    }
     exit;
   }
   mysqli_stmt_close($stmt_insert_professor);
@@ -251,4 +260,4 @@ mysqli_commit($DB_T);
 releaseLock($DB_T, $lockEmailKey);
 
 http_response_code(201);
-echo json_encode(['success' => true, 'created' => $acco_id, 'strontg_password' => $plain_password]);
+echo json_encode(['success' => true, 'created' => $acco_id, 'plain_password' => $plain_password]);

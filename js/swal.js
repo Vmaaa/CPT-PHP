@@ -20,6 +20,8 @@ async function SwalConfirm(
     icon = "warning",
     confirmButtonText = "Yes",
     cancelButtonText = "No",
+    showCancelButton = true,
+    reverseButtons = true,
   },
 ) {
   const SwalWithCustomClass = Swal.mixin({
@@ -34,12 +36,50 @@ async function SwalConfirm(
     title: title,
     text: text,
     icon: icon,
+    showCancelButton: showCancelButton,
+    confirmButtonText: confirmButtonText,
+    cancelButtonText: cancelButtonText,
+    reverseButtons: reverseButtons,
+  });
+  return response.isConfirmed;
+}
+
+async function SwalInput(
+  {
+    title = "",
+    inputLabel = "",
+    inputPlaceholder = "",
+    inputValue = "",
+    inputType = "text",
+    confirmButtonText = "Submit",
+    cancelButtonText = "Cancel",
+  },
+) {
+  const SwalWithCustomClass = Swal.mixin({
+    customClass: {
+      confirmButton: "btn btn-primary m-16",
+      cancelButton: "btn btn-secondary",
+      input: "form-control-modal",
+    },
+    buttonsStyling: false,
+  });
+
+  const response = await SwalWithCustomClass.fire({
+    title: title,
+    input: inputType,
+    inputLabel: inputLabel,
+    inputPlaceholder: inputPlaceholder,
+    inputValue: inputValue,
     showCancelButton: true,
     confirmButtonText: confirmButtonText,
     cancelButtonText: cancelButtonText,
     reverseButtons: true,
   });
-  return response.isConfirmed;
+  if (response.isConfirmed) {
+    return response.value;
+  } else {
+    return null;
+  }
 }
 
 // Example usage:

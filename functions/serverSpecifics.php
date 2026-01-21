@@ -4,6 +4,7 @@ class ServerSpecifics
   protected $API_URL;
   protected $WEBPAGE_URL;
   protected $SYSTEM_NAME = "CPT";
+  protected $SYSTEM_SECRET;
 
   protected $dbHost;
   protected $dbUser;
@@ -23,6 +24,7 @@ class ServerSpecifics
     $this->dbUser = getenv('DB_USER');
     $this->dbPwd  = getenv('DB_PASSWORD');
     $this->dbName = getenv('DB_NAME');
+    $this->SYSTEM_SECRET = getenv('SYSTEM_SECRET');
   }
 
   public static function getInstance(): ServerSpecifics
@@ -65,5 +67,10 @@ class ServerSpecifics
   function fnt_getSystemName(): string
   {
     return $this->SYSTEM_NAME;
+  }
+
+  function fnt_getSystemSecret(): string
+  {
+    return $this->SYSTEM_SECRET;
   }
 }
