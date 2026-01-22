@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function fetchAccountsData() {
   const queryParams = new URLSearchParams({
     acco_role_exclude: "student",
+    from_admin_panel: "1",
   });
 
   try {

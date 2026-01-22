@@ -16,16 +16,11 @@ require_once __DIR__ . "/../../../utils/output/parse_custom_request.php";
 
 $valid_acco_roles = ['professor', 'admin', 'student'];
 
-if ($AUTH['acco_role'] !== 'admin') {
-  http_response_code(403);
-  echo json_encode(['error' => 'No tienes permiso para acceder a este recurso']);
-  exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $status = isset($_GET['status']) ? (int) $_GET['status'] : null;
   $acco_role = isset($_GET['acco_role']) ? $_GET['acco_role'] : null;
   $acco_role_exclude = isset($_GET['acco_role_exclude']) ? $_GET['acco_role_exclude'] : null;
+  $from_admin_panel = isset($_GET['from_admin_panel']) ? (int) $_GET['from_admin_panel'] : 0;
 
   $conds = [];
   $params = [];
@@ -62,6 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $conds[] = "acco_role != ?";
     $params[] = $acco_role_exclude;
     $types .= 's';
+  }
+
+  if ($from_admin_panel === 0 || $AUTH['acco_role'] !== 'admin') {
+    $conds[] = "acco_id = ?";
+    $params[] = $AUTH['acco_id'];
+    $types .= 'i';
   }
 
   $query = "SELECT * FROM account";
