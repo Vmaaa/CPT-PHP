@@ -75,6 +75,12 @@
   color: #777;
 }
 
+.more-info {
+  font-size: 12px;
+  color: #555;
+  font-style: italic;
+}
+
 .no-data-list {
   font-size: 13px;
   color: #999;

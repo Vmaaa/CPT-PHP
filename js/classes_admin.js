@@ -135,15 +135,20 @@ function getCareerNameById(careers, idCareer) {
 
 async function createClassCard(cls) {
   const card = document.createElement("div");
+  const maxDisplayProfessors = 2;
   card.className = "class-card";
 
   const professorsHTML = cls.professors.length
-    ? cls.professors.map((p) => `
+    ? cls.professors.slice(0, maxDisplayProfessors).map((p) => `
         <li>
           <span class="name">${p.name}</span>
           <span class="name-subtitle">${p.academia}</span>
         </li>
-      `).join("")
+      `).join("") + (cls.professors.length > maxDisplayProfessors
+      ? `<li class="more-info">y ${
+        cls.professors.length - maxDisplayProfessors
+      } más...</li>`
+      : "")
     : `<li class="no-data-list">Sin profesores asignados</li>`;
   card.innerHTML = `
     <div class="class-card-header">

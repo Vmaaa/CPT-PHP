@@ -123,22 +123,33 @@ function getCareerNameById(careers, idCareer) {
 async function createClassCard(cls) {
   const card = document.createElement("div");
   card.className = "class-card";
+  const maxDisplayProfessors = 2;
+  const maxDisplayStudents = 3;
 
   const professorsHTML = cls.professors.length
-    ? cls.professors.map((p) => `
+    ? cls.professors.slice(0, maxDisplayProfessors).map((p) => `
         <li>
           <span class="name">${p.name}</span>
           <span class="name-subtitle">${p.academia}</span>
         </li>
-      `).join("")
+      `).join("") + (cls.professors.length > maxDisplayProfessors
+      ? `<li class="more-info">y ${
+        cls.professors.length - maxDisplayProfessors
+      } más...</li>`
+      : "")
     : `<li class="no-data-list">Sin profesores asignados</li>`;
+
   const studentsHTML = cls.students.length
-    ? cls.students.map((s) => `
+    ? cls.students.slice(0, maxDisplayStudents).map((s) => `
         <li>
           <span class="name">${s.name}</span>
           <span class="name-subtitle">${s.school_id_number}</span>
         </li>
-      `).join("")
+      `).join("") + (cls.students.length > maxDisplayStudents
+      ? `<li class="more-info">y ${
+        cls.students.length - maxDisplayStudents
+      } más...</li>`
+      : "")
     : `<li class="no-data-list">Sin estudiantes inscritos</li>`;
 
   card.innerHTML = `
