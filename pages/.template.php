@@ -22,7 +22,9 @@ $pageScript = "SCRIPT.js";
     <?php require_once __DIR__ . '/../inc/inc_sidebar.php'; ?>
     <div class="main-content">
       <main class="main-content-inner" style="padding: 20px;">
-
+        <div style="margin-bottom: 30px;">
+          <h1 style="font-size: 24px; font-weight: bold;"><?php echo $pageTitle; ?></h1>
+        </div>
       </main>
     </div>
   </div>
