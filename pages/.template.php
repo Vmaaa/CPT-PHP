@@ -12,7 +12,7 @@ $pageScript = "SCRIPT.js";
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
   <title><?= $pageTitle ?> -
-    <?echo $SYSTEM_NAME ?>
+    <?= $SYSTEM_NAME ?>
   </title>
 </head>
 

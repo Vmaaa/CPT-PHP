@@ -2,13 +2,16 @@
 require_once __DIR__ . '/../config/app.php';
 $pageScript = "recovery_password.js";
 $pageStyle = "pages/password_form.css";
+$pageTitle = "Recuperar contraseña";
 ?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title>Recuperación de contraseña - <?php echo $SYSTEM_NAME ?></title>
+  <title><?= $pageTitle ?> -
+    <?= $SYSTEM_NAME ?>
+  </title>
 </head>
 
 <body>

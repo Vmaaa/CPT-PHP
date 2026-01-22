@@ -12,7 +12,9 @@ $pageScript = "account_permission.js";
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title><?= $SYSTEM_NAME ?> - <?php echo $SYSTEM_NAME ?> </title>
+  <title><?= $pageTitle ?> -
+    <?= $SYSTEM_NAME ?>
+  </title>
 </head>
 
 <body>

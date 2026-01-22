@@ -2,13 +2,16 @@
 require_once __DIR__ . '/../config/app.php';
 $pageScript = "register.js";
 $pageStyle = "pages/login-register.css";
+$pageTitle = "Registro de usuario";
 ?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title>Registro - CPT</title>
+  <title><?= $pageTitle ?> -
+    <?= $SYSTEM_NAME ?>
+  </title>
 </head>
 
 <body>

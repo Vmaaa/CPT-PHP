@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/app.php';
 $pageScript = "change_password.js";
+$pageTitle = "Cambiar contraseña";
 $pageStyle = "pages/password_form.css";
 ?>
 <!DOCTYPE html>
@@ -8,8 +9,8 @@ $pageStyle = "pages/password_form.css";
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title>Recuperación de contraseña -
-    <?echo $SYSTEM_NAME ?>
+  <title><?= $pageTitle ?> -
+    <?= $SYSTEM_NAME ?>
   </title>
   <script>
     window.APP_BASE_URL = "<?= htmlspecialchars(BASE_URL ?: '') ?>";
