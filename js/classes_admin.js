@@ -88,12 +88,17 @@ async function loadCareers(selectElement, selectedId = null) {
 
 async function loadClasses() {
   try {
-    const response = await CookieManager.fetchWithAuth(CLASS_API_URL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const queryParams = new URLSearchParams({
+      "from_admin_panel": "1",
     });
+    const response = await CookieManager.fetchWithAuth(
+      `${CLASS_API_URL}?${queryParams.toString()}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
     if (!response.ok) {
       throw new Error("Error al cargar las clases");

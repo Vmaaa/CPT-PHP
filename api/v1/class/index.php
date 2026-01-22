@@ -20,9 +20,9 @@ if (!in_array($AUTH['acco_role'], ['admin', 'professor'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
   $id_class  = isset($_GET['id_class']) ? (int) $_GET['id_class'] : null;
   $id_career = isset($_GET['id_career']) ? (int) $_GET['id_career'] : null;
+  $from_admin_panel = isset($_GET['from_admin_panel']) ? (int) $_GET['from_admin_panel'] : 0;
 
   $conds = [];
   $params = [];
@@ -37,6 +37,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   if ($id_career !== null) {
     $conds[] = "id_career = ?";
     $params[] = $id_career;
+    $types .= 'i';
+  }
+
+  if ($from_admin_panel === 0 || $AUTH['acco_role'] === 'professor') {
+    $conds[] = "id_class IN (
+      SELECT cp.id_class
+      FROM class_professor cp
+      WHERE cp.id_professor = ?
+    )";
+    $params[] = $AUTH['id_professor'];
     $types .= 'i';
   }
 
@@ -58,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   while ($row = mysqli_fetch_assoc($result)) {
     $row['professors'] = [];
+    $row['students'] = [];
     $classes[$row['id_class']] = $row;
   }
 
@@ -73,12 +84,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach ($professors_data['data'] as $prof) {
       $class['professors'][] = $prof;
     }
+    //peticion a la api de students
+    $ch = curl_init($API_URL . "/class/student/?id_class=" . $id_class);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
+    ]);
+    $response = curl_exec($ch);
+    $students_data = json_decode($response, true);
+    foreach ($students_data['data'] as $stud) {
+      $class['students'][] = $stud;
+    }
   }
 
   http_response_code(200);
   echo json_encode([
     'data' => array_values($classes),
-    'count' => count($classes)
+    'count' => count($classes),
   ]);
 }
 
