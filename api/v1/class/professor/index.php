@@ -13,12 +13,6 @@ require_once __DIR__ . "/../../../../config/cors.php";
 require_once __DIR__ . "/../../../../utils/token/pre_validate.php";
 require_once __DIR__ . "/../../../../utils/input/input_parser.php";
 
-if ($AUTH['acco_role'] !== 'admin') {
-  http_response_code(403);
-  echo json_encode(['error' => 'Solo admin puede modificar asignaciones']);
-  exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   if (!isset($_GET['id_class'])) {
