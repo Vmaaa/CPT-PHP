@@ -1,6 +1,5 @@
-
 <?php
-$AVALIABLE_METHODS = ['PUT'];
+$AVALIABLE_METHODS = ['GET'];
 
 header('Content-Type: application/json');
 
@@ -16,6 +15,39 @@ require_once __DIR__ . "/../../../utils/input/input_parser.php";
 require_once __DIR__ . "/../../../utils/output/parse_custom_request.php";
 
 $valid_acco_roles = ['professor', 'admin', 'student'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+  try {
+    $query = "SELECT * FROM professor";
+
+    $stmt = mysqli_prepare($DB_T, $query);
+    if (!$stmt) {
+      throw new Exception(mysqli_error($DB_T));
+    }
+
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $professors = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+      $professors[] = $row;
+    }
+
+    mysqli_stmt_close($stmt);
+
+    echo json_encode([
+      'data' => $professors,
+      'count' => count($professors)
+    ]);
+  } catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+      'error' => 'Error al obtener profesores',
+      'detail' => $e->getMessage()
+    ]);
+  }
+  exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
   $_PUT = fnt_parseInputMultiPart();

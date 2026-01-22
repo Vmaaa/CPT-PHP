@@ -10,7 +10,6 @@ window.toggleSubmenu = function (menuId) {
 };
 
 window.openModal = function (backdropId) {
-  console.log("Opening modal:", backdropId);
   document.querySelectorAll(".modal-backdrop").forEach(
     (m) => (m.style.display = "none"),
   );

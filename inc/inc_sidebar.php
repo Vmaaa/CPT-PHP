@@ -9,6 +9,7 @@ $projectModuleStudent = ['PROYECTO_S'  => ['url' => 'pages/projects_student.php'
 $classModuleAdmin        = ['CLASES_A'     => ['url' => 'pages/classes_admin.php',   'icon' => 'fas fa-school', 'label' => 'Clases']];
 $classModuleProfessor     = ['CLASES_P'     => ['url' => 'pages/classes.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
 $classModuleStudent       = ['CLASES_S'     => ['url' => 'pages/classes_student.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
+$projectModuleAdmin      = ['PROYECTOS_ADMIN' => ['url' => 'pages/projects_admin.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyectos']];
 
 $userModule   = ['USUARIOS' => ['url' => 'pages/account_permission.php',   'icon' => 'fas fa-user-cog',      'label' => 'Usuarios']];
 $accountModule = ['CUENTA'    => ['url' => 'pages/account.php', 'icon' => 'fas fa-user-circle',   'label' => 'Mi Cuenta']];
@@ -16,7 +17,7 @@ $logoutModule  = ['CERRAR_SESION' => ['icon' => 'fas fa-sign-out-alt',  'label' 
 
 $rolePermissions = [
   'admin' => [
-    'Administrador' => array_merge($classModuleAdmin, $userModule),
+    'Administrador' => array_merge($classModuleAdmin, $userModule, $projectModuleAdmin),
     'Profesor' => array_merge($advisedModule, $revisionModule, $projectModuleProfessor, $classModuleProfessor),
     'Mi Cuenta' => $accountModule,
   ],
