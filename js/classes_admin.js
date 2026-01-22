@@ -135,12 +135,11 @@ async function createClassCard(cls) {
   const professorsHTML = cls.professors.length
     ? cls.professors.map((p) => `
         <li>
-          <span class="prof-name">${p.name}</span>
-          <span class="prof-email">${p.academia}</span>
+          <span class="name">${p.name}</span>
+          <span class="name-subtitle">${p.academia}</span>
         </li>
       `).join("")
-    : `<li class="no-professors">Sin profesores asignados</li>`;
-
+    : `<li class="no-data-list">Sin profesores asignados</li>`;
   card.innerHTML = `
     <div class="class-card-header">
       <h3>${cls.name}</h3>
@@ -153,7 +152,7 @@ async function createClassCard(cls) {
       <p class="created">Creada: ${formatDate(cls.created_at)}</p>
 
       <h4>Profesores</h4>
-      <ul class="professors-list">
+      <ul class="list">
         ${professorsHTML}
       </ul>
     </div>

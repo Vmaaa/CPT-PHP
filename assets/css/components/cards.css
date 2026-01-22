@@ -54,28 +54,28 @@
 }
 
 /* PROFESSORS */
-.professors-list {
+.list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.professors-list li {
+.list li {
   padding: 6px 0;
   border-bottom: 1px dashed #eee;
 }
 
-.prof-name {
+.name {
   display: block;
   font-weight: 500;
 }
 
-.prof-email {
+.name-subtitle {
   font-size: 12px;
   color: #777;
 }
 
-.no-professors {
+.no-data-list {
   font-size: 13px;
   color: #999;
 }
@@ -87,29 +87,6 @@
   justify-content: flex-end;
   gap: 10px;
   border-top: 1px solid #eee;
-}
-
-/* BUTTONS */
-.btn {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.btn-edit {
-  background: #2563eb;
-  color: #fff;
-}
-
-.btn-danger {
-  background: #dc2626;
-  color: #fff;
-}
-
-.btn:hover {
-  opacity: 0.9;
 }
 
 /* STATES */
