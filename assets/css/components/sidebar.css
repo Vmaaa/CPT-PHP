@@ -1,6 +1,6 @@
 .sidebar {
   background: var(--primary);
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   position: sticky;
   top: 0;
   height: 100vh;
@@ -16,14 +16,6 @@
   right: 0;
   height: 4px;
 }
-
-.sidebar-logo {
-  text-align: center;
-  width: 80%;
-  margin-left: 8%;
-  margin-bottom: 2rem;
-}
-
 
 .nav-item {
   display: flex;
@@ -84,4 +76,18 @@
   .nav-item .nav-text {
     display: none;
   }
+
+  .nav-section-title {
+    display: none;
+  }
+}
+
+.nav-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--bg-primary);
+  padding: 0 2.0rem;
+  margin: 0;
+  letter-spacing: 0.5px;
 }

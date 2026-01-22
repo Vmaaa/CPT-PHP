@@ -10,15 +10,24 @@ $classModuleAdmin        = ['CLASES'     => ['url' => 'pages/classes_admin.php',
 $classModuleProfessor     = ['CLASES'     => ['url' => 'pages/classes.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
 $classModuleStudent       = ['CLASES'     => ['url' => 'pages/classes_student.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
 
-
 $userModule   = ['USUARIOS' => ['url' => 'pages/account_permission.php',   'icon' => 'fas fa-user-cog',      'label' => 'Usuarios']];
 $accountModule = ['CUENTA'    => ['url' => 'pages/account.php', 'icon' => 'fas fa-user-circle',   'label' => 'Mi Cuenta']];
 $logoutModule  = ['CERRAR_SESION' => ['icon' => 'fas fa-sign-out-alt',  'label' => 'Cerrar Sesión']];
 
 $rolePermissions = [
-  'admin' => array_merge($advisedModule, $revisionModule, $projectModuleProfessor, $classModuleAdmin, $userModule, $accountModule),
-  'student' => array_merge($projectModuleStudent, $classModuleStudent, $accountModule),
-  'professor' => array_merge($revisionModule, $projectModuleProfessor, $classModuleProfessor, $accountModule),
+  'admin' => [
+    'Administrador' => array_merge($classModuleAdmin, $userModule),
+    'Profesor' => array_merge($advisedModule, $revisionModule, $projectModuleProfessor),
+    'Mi Cuenta' => $accountModule,
+  ],
+  'student' => [
+    'Estudiante' => array_merge($projectModuleStudent, $classModuleStudent),
+    'Mi Cuenta' => $accountModule,
+  ],
+  'professor' => [
+    'Profesor' => array_merge($revisionModule, $projectModuleProfessor, $classModuleProfessor),
+    'Mi Cuenta' => $accountModule,
+  ],
 ];
 
 $allowedModules = $rolePermissions[$role] ?? [];
@@ -26,16 +35,21 @@ $allowedModules = $rolePermissions[$role] ?? [];
 
 <nav class="sidebar">
   <div class="nav-links">
-    <?php foreach ($allowedModules as $pageKey => $module): ?>
-      <a href="<?= url($module['url']) ?>" class="nav-item <?= $activePage === $pageKey ? 'active' : '' ?>" data-page="<?= strtolower(str_replace(' ', '-', $module['label'])) ?>">
-        <i class="<?= $module['icon'] ?> nav-icon"></i>
-        <span><?= $module['label'] ?></span>
-      </a>
+    <?php foreach ($allowedModules as $sectionTitle => $modules): ?>
+      <div class="nav-section">
+        <h3 class="nav-section-title"><?= $sectionTitle ?></h3>
+        <?php foreach ($modules as $pageKey => $module): ?>
+          <a href="<?= url($module['url']) ?>" class="nav-item <?= $activePage === $pageKey ? 'active' : '' ?>" data-page="<?= strtolower(str_replace(' ', '-', $module['label'])) ?>">
+            <i class="<?= $module['icon'] ?> nav-icon"></i>
+            <span><?= $module['label'] ?></span>
+          </a>
+        <?php endforeach; ?>
+      </div>
     <?php endforeach; ?>
     <!-- Logout Link -->
     <a href="#" class="nav-item" id="logout-btn">
       <i class="<?= $logoutModule['CERRAR_SESION']['icon'] ?> nav-icon"></i>
       <span><?= $logoutModule['CERRAR_SESION']['label'] ?></span>
-      </button>
     </a>
+  </div>
 </nav>
