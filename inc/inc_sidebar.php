@@ -2,9 +2,6 @@
 $role = $AUTH['acco_role'];
 $activePage = $activePage ?? '';
 
-$dashboardModuleAdmin = ['DASHBOARD' => ['url' => 'pages/dashboard.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard']];
-$dashboardModuleProfessor = ['DASHBOARD' => ['url' => 'pages/dashboard_professor.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard']];
-$dashboardModuleStudent = ['DASHBOARD' => ['url' => 'pages/dashboard_student.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Dashboard']];
 $advisedModule   = ['ASESORADOS' => ['url' => 'pages/advised.php',  'icon' => 'fas fa-user-friends',   'label' => 'Asesorados']];
 $revisionModule  = ['REVISIONES' => ['url' => 'pages/revisions.php', 'icon' => 'fas fa-check-double',   'label' => 'Revisiones']];
 $projectModuleProfessor   = ['PROYECTOS'  => ['url' => 'pages/projects.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyectos']];
@@ -14,14 +11,14 @@ $classModuleProfessor     = ['CLASES'     => ['url' => 'pages/classes.php',   'i
 $classModuleStudent       = ['CLASES'     => ['url' => 'pages/classes_student.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
 
 
-$userModule   = ['USUARIOS' => ['url' => 'pages/user.php',   'icon' => 'fas fa-user-cog',      'label' => 'Usuarios']];
+$userModule   = ['USUARIOS' => ['url' => 'pages/account_permission.php',   'icon' => 'fas fa-user-cog',      'label' => 'Usuarios']];
 $accountModule = ['CUENTA'    => ['url' => 'pages/account.php', 'icon' => 'fas fa-user-circle',   'label' => 'Mi Cuenta']];
 $logoutModule  = ['CERRAR_SESION' => ['icon' => 'fas fa-sign-out-alt',  'label' => 'Cerrar Sesión']];
 
 $rolePermissions = [
-  'admin' => array_merge($dashboardModuleAdmin, $advisedModule, $revisionModule, $projectModuleProfessor, $classModuleAdmin, $userModule, $accountModule),
-  'student' => array_merge($dashboardModuleStudent, $projectModuleStudent, $classModuleStudent, $accountModule),
-  'professor' => array_merge($dashboardModuleProfessor, $revisionModule, $projectModuleProfessor, $classModuleProfessor, $accountModule),
+  'admin' => array_merge($advisedModule, $revisionModule, $projectModuleProfessor, $classModuleAdmin, $userModule, $accountModule),
+  'student' => array_merge($projectModuleStudent, $classModuleStudent, $accountModule),
+  'professor' => array_merge($revisionModule, $projectModuleProfessor, $classModuleProfessor, $accountModule),
 ];
 
 $allowedModules = $rolePermissions[$role] ?? [];

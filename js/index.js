@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (response.ok && data.success) {
           window.location.href = `${
             window.APP_BASE_URL || ""
-          }/pages/dashboard.php`;
+          }/pages/account.php`;
         } else {
           SwalMessage(
             {

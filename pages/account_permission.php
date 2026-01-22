@@ -4,7 +4,7 @@ require_once __DIR__ . '/../inc/inc_auth.php';
 
 $activePage = "USUARIOS";
 $pageTitle = "Manejo de usuarios";
-$pageScript = "user.js";
+$pageScript = "account_permission.js";
 ?>
 
 <!DOCTYPE html>

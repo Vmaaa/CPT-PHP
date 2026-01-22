@@ -26,7 +26,6 @@ $pageScript = "SCRIPT.js";
       </main>
     </div>
   </div>
-  <?php require_once __DIR__ . '/../inc/inc_modals.php'; ?>
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
 </body>
 
