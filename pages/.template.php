@@ -11,19 +11,19 @@ $pageScript = "SCRIPT.js";
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title><?= $pageTitle ?> - TeleAdmin</title>
+  <title><?= $pageTitle ?> -
+    <?echo $SYSTEM_NAME ?>
+  </title>
 </head>
 
 <body>
-  <div class="app-container" style="display:flex;">
+
+  <div id="app-container" class="app-container">
     <?php require_once __DIR__ . '/../inc/inc_sidebar.php'; ?>
     <div class="main-content">
-      <?php require_once __DIR__ . '/../inc/inc_topbar.php'; ?>
+      <main class="main-content-inner" style="padding: 20px;">
 
-      <div class="content-area">
-        <!-- AQUI LA View Correspondiente al HTML -->
-
-      </div>
+      </main>
     </div>
   </div>
   <?php require_once __DIR__ . '/../inc/inc_modals.php'; ?>

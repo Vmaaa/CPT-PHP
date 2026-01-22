@@ -12,7 +12,7 @@ $pageScript = "user.js";
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title>Manejo de usuarios - <?php echo $SYSTEM_NAME ?> </title>
+  <title><?= $SYSTEM_NAME ?> - <?php echo $SYSTEM_NAME ?> </title>
 </head>
 
 <body>
