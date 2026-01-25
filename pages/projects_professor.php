@@ -21,9 +21,27 @@ $pageScript = "projects_professor.js";
 
     <div class="main-content">
       <main class="main-content-inner" style="padding:20px">
-        <h1><?= $pageTitle ?></h1>
+
+        <h1 style="margin-bottom:30px; font-weight:700; color:#1e293b;"><?= $pageTitle ?></h1>
+
         <div id="projects-container"></div>
+
       </main>
+    </div>
+  </div>
+
+  <div id="pdfModal" class="modal-overlay" style="display:none">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="margin:0">Visualización de Protocolo</h3>
+        <button class="modal-close" onclick="closePdfModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="pdfViewer" src="" style="width:100%; height:100%; border:none;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePdfModal()">Cerrar</button>
+      </div>
     </div>
   </div>
 

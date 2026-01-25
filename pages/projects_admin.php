@@ -23,9 +23,8 @@ $pageScript = "projects_admin.js";
 
     <div class="main-content">
       <main class="main-content-inner" style="padding:20px">
-
+        <h1 class="page-title"><?= $pageTitle ?></h1>
         <div class="page-header">
-          <h1><?= $pageTitle ?></h1>
           <p class="page-subtitle">
             Administración y asignación de revisores de proyectos.
           </p>

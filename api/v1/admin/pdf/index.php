@@ -5,10 +5,6 @@ require_once dirname(__DIR__, 4) . "/config/cors.php";
 require_once dirname(__DIR__, 4) . "/utils/token/pre_validate.php";
 require_once dirname(__DIR__, 4) . "/functions/serverSpecifics.php";
 
-if (!isset($AUTH) || $AUTH['acco_role'] !== 'admin') {
-  http_response_code(403);
-  exit;
-}
 
 if (!isset($_GET['id'])) {
   http_response_code(400);
