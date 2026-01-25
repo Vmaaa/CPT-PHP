@@ -22,7 +22,8 @@ $pageScript = "protocolo.js";
 
     <div class="main-content">
       <main class="main-content-inner" style="padding: 20px;">
-        <h1 style="margin-bottom: 30px;"><?= $pageTitle ?></h1>
+
+        <h1 style="margin-bottom: 30px; color: #1e293b; font-weight: 700;"><?= $pageTitle ?></h1>
 
         <div id="protocol-container">
           <div class="loading">
@@ -32,6 +33,21 @@ $pageScript = "protocolo.js";
         </div>
 
       </main>
+    </div>
+  </div>
+
+  <div id="pdfModal" class="modal-overlay" style="display:none">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="margin:0">Visualizador de Documentos</h3>
+        <button class="modal-close" onclick="closePdfModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="pdfViewer" src="" style="width:100%; height:100%; border:none;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closePdfModal()">Cerrar</button>
+      </div>
     </div>
   </div>
 

@@ -77,6 +77,43 @@ try {
   }
 
   echo json_encode(['success' => true, 'pdf_url' => $reviewerPdfUrl]);
+
+  $stmtId = $DB->prepare("SELECT id_fp_change FROM fp_change_review WHERE id_fp_change_review = ?");
+  $stmtId->bind_param("i", $reviewId);
+  $stmtId->execute();
+  $rowChange = $stmtId->get_result()->fetch_assoc();
+  $idFpChange = $rowChange['id_fp_change'];
+
+  // 2. Contar los votos de todos los revisores de este cambio
+  $stmtVotes = $DB->prepare("SELECT grade, comment FROM fp_change_review WHERE id_fp_change = ?");
+  $stmtVotes->bind_param("i", $idFpChange);
+  $stmtVotes->execute();
+  $resVotes = $stmtVotes->get_result();
+
+  $completedReviews = 0;
+  $votesApproved = 0;
+
+  while ($row = $resVotes->fetch_assoc()) {
+    if ($row['grade'] !== null) {
+      $completedReviews++;
+      if ((int)$row['grade'] === 1) {
+        $votesApproved++;
+      }
+    }
+  }
+
+  if ($completedReviews === 3) {
+    $finalStatus = ($votesApproved >= 2) ? 'APPROVED' : 'REJECTED';
+
+    // Actualizamos la tabla principal (final_project)
+    $stmtFinal = $DB->prepare("
+          UPDATE final_project 
+          SET status = ? 
+          WHERE id_final_project = (SELECT id_final_project FROM fp_change WHERE id_fp_change = ?)
+      ");
+    $stmtFinal->bind_param("si", $finalStatus, $idFpChange);
+    $stmtFinal->execute();
+  }
 } catch (Exception $e) {
   http_response_code(500);
   echo json_encode(['error' => $e->getMessage()]);

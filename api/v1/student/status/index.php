@@ -28,18 +28,6 @@ $MAIN_DB = $SS->fnt_getDBConnection();
  * $AUTH
  */
 
-if (!$AUTH) {
-  http_response_code(401);
-  echo json_encode(['error' => 'Unauthorized']);
-  exit;
-}
-
-if ($AUTH['acco_role'] !== 'student') {
-  http_response_code(403);
-  echo json_encode(['error' => 'Forbidden']);
-  exit;
-}
-
 try {
 
   // 1. Obtener id_student
@@ -114,7 +102,7 @@ try {
         r.id_professor,
         pr.name AS professor_name,
         r.comment,
-        r.file_url,
+        r.reviewer_pdf_url,
         r.grade,
         r.created_at
       FROM fp_change_review r
