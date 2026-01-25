@@ -13,8 +13,6 @@ $pageScript = "projects_admin.js";
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
   <title><?= $pageTitle ?> - <?= $SYSTEM_NAME ?></title>
-
-  <!-- CSS específico -->
   <link rel="stylesheet" href="/CPT/assets/css/pages/projects_admin.css">
 </head>
 
@@ -33,7 +31,6 @@ $pageScript = "projects_admin.js";
           </p>
         </div>
 
-        <!-- CONTENEDOR -->
         <div id="projects-container" class="cards-grid">
           <p>Cargando proyectos...</p>
         </div>
@@ -73,6 +70,27 @@ $pageScript = "projects_admin.js";
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeAssignModal()">Cancelar</button>
         <button class="btn-primary" onclick="saveReviewers()">Guardar</button>
+      </div>
+
+    </div>
+  </div>
+  <div id="assignModal" class="modal-overlay" style="display:none">
+  </div>
+
+  <div id="pdfModal" class="modal-overlay" style="display:none; z-index: 1050;">
+    <div class="modal-card" style="width: 85%; height: 90vh; max-width: 1000px; display:flex; flex-direction:column; padding:0;">
+
+      <div class="modal-header" style="padding: 15px 20px; border-bottom:1px solid #eee;">
+        <h3 style="margin:0;">Visualización de Protocolo</h3>
+        <button class="modal-close" onclick="closePdfModal()">×</button>
+      </div>
+
+      <div class="modal-body" style="flex:1; background:#f3f4f6; position:relative;">
+        <iframe id="pdfViewer" src="" style="width:100%; height:100%; border:none;"></iframe>
+      </div>
+
+      <div class="modal-footer" style="padding: 10px 20px;">
+        <button class="btn-secondary" onclick="closePdfModal()">Cerrar</button>
       </div>
 
     </div>

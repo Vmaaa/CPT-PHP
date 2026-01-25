@@ -1,6 +1,9 @@
 const ADMIN_PROJECTS_API = API_URL + "/admin/projects";
 const ADMIN_ASSIGN_REVIEWERS_API = API_URL + "/admin/assign_reviewers/";
 const PROFESSORS_API = API_URL + "/professor/advisor";
+const ADMIN_PDF_API = API_URL + "/admin/pdf";
+
+let cachedProfessors = null;
 
 document.addEventListener("DOMContentLoaded", loadAdminProjects);
 
@@ -13,7 +16,6 @@ async function loadAdminProjects() {
     const data = await res.json();
 
     if (!res.ok) throw data;
-
     renderAdminProjects(data.data || []);
   } catch (err) {
     console.error(err);
@@ -30,14 +32,39 @@ function renderAdminProjects(projects) {
     return;
   }
 
+  const statusMap = {
+    "PENDING": { text: "Pendiente", class: "status-pending" },
+    "UNDER_REVIEW": { text: "En Revisión", class: "status-under_review" },
+    "APPROVED": { text: "Aprobado", class: "status-approved" },
+    "REJECTED": { text: "Rechazado", class: "status-rejected" },
+  };
+
   projects.forEach((p) => {
     const card = document.createElement("div");
     card.className = "project-admin-card";
 
+    let r1 = null, r2 = null, r3 = null;
+    let hasReviewers = false;
+
+    if (p.reviewers_ids) {
+      const ids = p.reviewers_ids.split(",");
+      r1 = ids[0] || null;
+      r2 = ids[1] || null;
+      r3 = ids[2] || null;
+      if (r1 || r2 || r3) hasReviewers = true;
+    }
+
+    const btnText = hasReviewers ? "Editar revisores" : "Asignar revisores";
+    const btnClass = hasReviewers
+      ? "btn-action-secondary"
+      : "btn-action-primary";
+    const statusInfo = statusMap[p.status] ||
+      { text: p.status, class: "status-pending" };
+
     card.innerHTML = `
       <div class="project-header">
         <h3>${escapeHtml(p.title)}</h3>
-        <span class="project-status ${p.status.toLowerCase()}">${p.status}</span>
+        <span class="project-status ${statusInfo.class}">${statusInfo.text}</span>
       </div>
 
       <p class="project-abstract">${escapeHtml(p.abstract)}</p>
@@ -49,10 +76,15 @@ function renderAdminProjects(projects) {
 
       <div class="project-actions">
         ${
-      p.file_url ? `<a href="${p.file_url}" target="_blank">Ver PDF</a>` : ""
+      p.file_url
+        ? `<button onclick="openPdfModal(${p.id_final_project})" 
+                 style="background:none; border:none; color:#2563eb; cursor:pointer; font-weight:500; font-size:0.9rem; padding:0; display:flex; align-items:center; gap:5px;">
+                 <i class="fas fa-eye"></i> Ver PDF
+               </button>`
+        : "<span></span>"
     }
-        <button class="btn-assign" onclick="openAssignModal(${p.id_final_project})">
-          Asignar revisores
+        <button class="${btnClass}" onclick="openAssignModal(${p.id_final_project}, '${r1}', '${r2}', '${r3}')">
+          ${btnText}
         </button>
       </div>
     `;
@@ -61,70 +93,114 @@ function renderAdminProjects(projects) {
   });
 }
 
-function openAssignModal(projectId) {
+function openPdfModal(projectId) {
+  const modal = document.getElementById("pdfModal");
+  const viewer = document.getElementById("pdfViewer");
+
+  viewer.src = `${ADMIN_PDF_API}?id=${projectId}`;
+  modal.style.display = "flex";
+}
+
+function closePdfModal() {
+  const modal = document.getElementById("pdfModal");
+  const viewer = document.getElementById("pdfViewer");
+
+  modal.style.display = "none";
+  viewer.src = "";
+}
+
+async function openAssignModal(projectId, r1, r2, r3) {
   document.getElementById("modal_project_id").value = projectId;
-  document.getElementById("assignModal").style.display = "flex";
-  loadProfessors();
+  const modal = document.getElementById("assignModal");
+  modal.style.display = "flex";
+
+  await loadProfessors();
+
+  document.getElementById("reviewer1").value = (r1 && r1 !== "null") ? r1 : "";
+  document.getElementById("reviewer2").value = (r2 && r2 !== "null") ? r2 : "";
+  document.getElementById("reviewer3").value = (r3 && r3 !== "null") ? r3 : "";
+
+  syncReviewerSelects();
 }
 
 function closeAssignModal() {
   document.getElementById("assignModal").style.display = "none";
+  ["reviewer1", "reviewer2", "reviewer3"].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
 }
 
 async function loadProfessors() {
-  const res = await CookieManager.fetchWithAuth(PROFESSORS_API);
-  const data = await res.json();
+  if (cachedProfessors) {
+    renderProfessorOptions(cachedProfessors);
+    return;
+  }
+
+  try {
+    const res = await CookieManager.fetchWithAuth(PROFESSORS_API);
+    const data = await res.json();
+    cachedProfessors = data.data;
+    renderProfessorOptions(cachedProfessors);
+  } catch (e) {
+    console.error("Error cargando profesores", e);
+  }
+}
+
+function renderProfessorOptions(professors) {
+  const select1 = document.getElementById("reviewer1");
+  if (select1.options.length > 1) return;
 
   ["reviewer1", "reviewer2", "reviewer3"].forEach((id) => {
     const select = document.getElementById(id);
+    const currentVal = select.value;
+
     select.innerHTML = `<option value="">Seleccione</option>`;
 
-    data.data.forEach((p) => {
+    professors.forEach((p) => {
       const opt = document.createElement("option");
       opt.value = p.id_professor;
       opt.textContent = p.name;
       select.appendChild(opt);
     });
 
-    // Escuchar cambios para bloquear duplicados
     select.addEventListener("change", syncReviewerSelects);
+    if (currentVal) select.value = currentVal;
   });
 }
 
 function syncReviewerSelects() {
-  const values = {
-    reviewer1: reviewer1.value,
-    reviewer2: reviewer2.value,
-    reviewer3: reviewer3.value,
-  };
+  const r1 = document.getElementById("reviewer1");
+  const r2 = document.getElementById("reviewer2");
+  const r3 = document.getElementById("reviewer3");
 
-  ["reviewer1", "reviewer2", "reviewer3"].forEach((id) => {
-    const select = document.getElementById(id);
+  const values = [r1.value, r2.value, r3.value].filter((v) => v);
+
+  [r1, r2, r3].forEach((select) => {
+    const currentVal = select.value;
 
     [...select.options].forEach((opt) => {
       if (!opt.value) return;
-
-      opt.disabled = Object.entries(values).some(
-        ([key, val]) => key !== id && val === opt.value,
-      );
+      opt.disabled = false;
+      if (values.includes(opt.value) && opt.value !== currentVal) {
+        opt.disabled = true;
+      }
     });
   });
 }
 
 async function saveReviewers() {
-  const r1 = reviewer1.value;
-  const r2 = reviewer2.value;
-  const r3 = reviewer3.value;
+  const r1 = document.getElementById("reviewer1").value;
+  const r2 = document.getElementById("reviewer2").value;
+  const r3 = document.getElementById("reviewer3").value;
   const projectId = document.getElementById("modal_project_id").value;
 
-  /* Validaciones frontend */
   if (!r1 || !r2 || !r3) {
-    alert("Debes seleccionar los 3 revisores");
+    Swal.fire("Atención", "Debes asignar los 3 revisores.", "warning");
     return;
   }
 
   if (new Set([r1, r2, r3]).size !== 3) {
-    alert("No puedes seleccionar el mismo revisor más de una vez");
+    Swal.fire("Error", "No puedes repetir revisores.", "error");
     return;
   }
 
@@ -135,37 +211,34 @@ async function saveReviewers() {
   form.append("reviewer3", r3);
 
   try {
-    const res = await CookieManager.fetchWithAuth(
-      ADMIN_ASSIGN_REVIEWERS_API,
-      {
-        method: "POST",
-        body: form,
-      },
-    );
+    const res = await CookieManager.fetchWithAuth(ADMIN_ASSIGN_REVIEWERS_API, {
+      method: "POST",
+      body: form,
+    });
 
     const data = await res.json();
-
     if (!res.ok) throw data;
 
     closeAssignModal();
-    loadAdminProjects();
 
-    if (typeof SwalMessage !== "undefined") {
-      SwalMessage({
-        title: "Éxito",
-        text: "Revisores asignados.",
-        icon: "success",
-      });
-    } else {
-      alert("Revisores asignados correctamente");
-    }
+    Swal.fire({
+      title: "¡Asignados!",
+      text: "Revisores guardados correctamente.",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+    }).then(() => {
+      loadAdminProjects();
+    });
   } catch (err) {
     console.error(err);
-    alert(err.error || "Error al asignar revisores");
+    Swal.fire(
+      "Error",
+      err.error || "Error al conectar con el servidor",
+      "error",
+    );
   }
 }
 
-/* ===== UTIL ===== */
 function escapeHtml(text) {
   return text
     ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")

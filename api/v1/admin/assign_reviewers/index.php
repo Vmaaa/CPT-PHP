@@ -3,7 +3,6 @@ $AVALIABLE_METHODS = ['POST'];
 
 header('Content-Type: application/json');
 
-// Validación de método HTTP
 if (!in_array($_SERVER['REQUEST_METHOD'], $AVALIABLE_METHODS)) {
   http_response_code(405);
   echo json_encode(['error' => 'Método HTTP no soportado']);
@@ -14,7 +13,6 @@ require_once dirname(__DIR__, 4) . "/config/cors.php";
 require_once dirname(__DIR__, 4) . "/utils/token/pre_validate.php";
 require_once dirname(__DIR__, 4) . "/functions/serverSpecifics.php";
 
-// Validación de permisos
 if (!isset($AUTH) || $AUTH['acco_role'] !== 'admin') {
   http_response_code(403);
   echo json_encode(['error' => 'Acceso denegado']);
@@ -27,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   try {
     $DB->begin_transaction();
 
-    // Validación de datos requeridos
     $required = ['id_final_project', 'reviewer1', 'reviewer2', 'reviewer3'];
     $missing = [];
 
@@ -48,16 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       (int)$_POST['reviewer3']
     ];
 
-    // Validar duplicados
     if (count(array_unique($reviewers)) !== 3) {
       throw new Exception("Revisores duplicados");
     }
 
-    // --- CAMBIO 1: Traemos también el 'file_url' en el SELECT ---
+    // Obtener el cambio más reciente
     $stmt = $DB->prepare(
-      "SELECT id_fp_change, file_url FROM fp_change
-            WHERE id_final_project=?
-            ORDER BY created_at DESC LIMIT 1"
+      "SELECT id_fp_change, file_url FROM fp_change 
+             WHERE id_final_project=? 
+             ORDER BY created_at DESC LIMIT 1"
     );
     $stmt->bind_param("i", $projectId);
     $stmt->execute();
@@ -66,19 +62,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$change) throw new Exception("No hay envío registrado para este proyecto");
 
     $idFpChange = $change['id_fp_change'];
-    $fileUrl = $change['file_url']; // Guardamos la URL en una variable
+    $fileUrl = $change['file_url'];
 
-    // --- CAMBIO 2: Agregamos 'file_url' al INSERT ---
-    // Asumimos que la columna en fp_change_review se llama 'file_url'
-    $stmt = $DB->prepare(
-      "INSERT INTO fp_change_review (id_fp_change, id_professor, file_url)
-            VALUES (?,?,?)"
+    // 1. LIMPIAR anteriores para evitar duplicados en la BD
+    $stmtDelete = $DB->prepare("DELETE FROM fp_change_review WHERE id_fp_change = ?");
+    $stmtDelete->bind_param("i", $idFpChange);
+    $stmtDelete->execute();
+
+    // 2. INSERTAR los nuevos revisores
+    $stmtInsert = $DB->prepare(
+      "INSERT INTO fp_change_review (id_fp_change, id_professor, file_url) 
+             VALUES (?,?,?)"
     );
 
     foreach ($reviewers as $r) {
-      // "iis" significa: integer, integer, string (la url)
-      $stmt->bind_param("iis", $idFpChange, $r, $fileUrl);
-      $stmt->execute();
+      $stmtInsert->bind_param("iis", $idFpChange, $r, $fileUrl);
+      $stmtInsert->execute();
     }
 
     // Actualizar estado del proyecto
