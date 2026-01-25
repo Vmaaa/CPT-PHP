@@ -26,7 +26,7 @@ $rolePermissions = [
     'Mi Cuenta' => $accountModule,
   ],
   'professor' => [
-    'Profesor' => array_merge($revisionModule, $projectModuleProfessor, $classModuleProfessor),
+    'Profesor' => array_merge($advisedModule, $revisionModule, $projectModuleProfessor, $classModuleProfessor),
     'Mi Cuenta' => $accountModule,
   ],
 ];
