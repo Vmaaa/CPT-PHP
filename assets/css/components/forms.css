@@ -28,7 +28,8 @@
 
 .form-group label {
   display: flex;
-  margin-bottom: 0.5rem;
+  margin-bottom: 6px;
+  margin-top: 12px;
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -37,8 +38,7 @@
 .form-select,
 .form-textarea {
   width: 100%;
-  margin-bottom: 2rem;
-  padding: 0.55rem 1rem;
+  padding: 12px 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;

@@ -1,0 +1,275 @@
+#advised-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 25px;
+  padding-bottom: 40px;
+}
+
+.advised-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  max-width: 100%;
+}
+
+.advised-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  background: #f8fafc;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.card-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.career-text {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.card-actions {
+  padding: 15px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #fff;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+
+/* Botón PDF (Azul claro) */
+.btn-pdf {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.btn-pdf:hover {
+  background: #dbeafe;
+}
+
+.btn-obs {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.btn-obs:hover {
+  background: #ffedd5;
+}
+
+
+.status-badge {
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #ffedd5;
+}
+
+.status-under-review {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+}
+
+.status-approved {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #dcfce7;
+}
+
+.status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fee2e2;
+}
+
+.reviews-list-modal {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.review-item-modal {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.review-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.text-approved {
+  color: #166534;
+}
+
+.text-rejected {
+  color: #b91c1c;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  /* Top, Right, Bottom, Left en 0 */
+  background: rgba(0, 0, 0, 0.5);
+  /* Negro semi-transparente */
+  backdrop-filter: blur(2px);
+  /* Un leve desenfoque al fondo */
+  z-index: 9999;
+  /* Asegura que esté encima de todo */
+
+  /* Centrado del contenido */
+  display: none;
+  /* Por defecto oculto, JS lo cambia a FLEX */
+  align-items: center;
+  justify-content: center;
+}
+
+/* La tarjeta blanca del modal */
+.modal-card {
+  background: #fff;
+  width: 90%;
+  max-width: 900px;
+  /* Ancho máximo */
+  height: 85vh;
+  /* Altura del 85% de la pantalla */
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+/* Animación suave de entrada */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Cabecera del Modal */
+.modal-header {
+  padding: 15px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.modal-close:hover {
+  color: #0f172a;
+}
+
+.modal-body {
+  flex: 1;
+  background: #f8fafc;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-footer {
+  padding: 15px 20px;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  text-align: right;
+}
+
+.btn-secondary {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}

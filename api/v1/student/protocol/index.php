@@ -98,11 +98,11 @@ try {
     $stmtOld->execute();
     $resOld = $stmtOld->get_result();
 
-    $insNewRev = $DB->prepare("INSERT INTO fp_change_review (id_professor, id_fp_change) VALUES (?, ?)");
+    $insNewRev = $DB->prepare("INSERT INTO fp_change_review (id_professor, id_fp_change, file_url) VALUES (?, ?, ?)");
 
     while ($rowProv = $resOld->fetch_assoc()) {
       $profId = $rowProv['id_professor'];
-      $insNewRev->bind_param("ii", $profId, $idNewChange);
+      $insNewRev->bind_param("iis", $profId, $idNewChange, $fileUrlDB);
       $insNewRev->execute();
     }
 
