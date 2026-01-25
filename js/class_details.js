@@ -1,4 +1,5 @@
 CLASS_API_URL = API_URL + "/class/";
+CLASS_ASSIGNMENT_API_URL = API_URL + "/class/assigment/";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -266,4 +267,81 @@ function openEditAssignmentModal(assignment) {
       : "Sin archivo actual";
 
   window.openModal("modal-assignment");
+}
+async function submitAssignment() {
+  const id = document.getElementById("assignment-id").value;
+  let editing = false;
+  if (id) {
+    editing = true;
+  }
+  const fileInput = document.getElementById("assignment-file");
+  const file = fileInput.files[0];
+
+  // Validación archivo
+  if (file) {
+    if (file.type !== "application/pdf") {
+      alert("El archivo debe ser un PDF");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("El archivo no debe superar los 5 MB");
+      return;
+    }
+  }
+
+  const formData = new FormData();
+  formData.append(
+    "id_class",
+    document.getElementById("assignment-class-id").value,
+  );
+  formData.append(
+    "title",
+    document.getElementById("assignment-title").value,
+  );
+  formData.append(
+    "description",
+    document.getElementById("assignment-description").value,
+  );
+
+  // Due date in format YYYY-MM-DD HH:MM:SS
+  const dueDateInput = document.getElementById("assignment-due-date").value;
+  const dueDate = new Date(dueDateInput);
+  const dueDateFormatted = dueDate
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+  formData.append("due_date", dueDateFormatted);
+
+  if (editing) {
+    formData.append("id_assigment", id);
+  }
+
+  if (file) {
+    formData.append("file", file);
+  }
+
+  const response = await CookieManager.fetchWithAuth(
+    CLASS_ASSIGNMENT_API_URL,
+    {
+      method: editing ? "PUT" : "POST",
+      body: formData,
+    },
+  );
+
+  if (!response.ok) {
+    SwalMessage({
+      tile: "Error",
+      text: "Suceció un error al guardar la asignación",
+      icon: "error",
+    });
+    return;
+  }
+
+  SwalMessage({
+    tile: "Éxito",
+    text: "Asignación" + (editing ? " editada" : " creada") + " correctamente",
+    icon: "success",
+  });
+  window.closeModal("modal-assignment");
 }
