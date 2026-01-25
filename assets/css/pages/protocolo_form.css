@@ -1,0 +1,131 @@
+.form-container-card {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.card-header {
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.card-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #1a237e;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  margin-top: 5px;
+}
+
+/* Títulos de secciones */
+.form-section h3 {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-section h3 i {
+  color: #1a237e;
+  font-size: 1rem;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+input[type="text"],
+select,
+textarea,
+input[type="file"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  /* Bordes redondeados consistentes */
+  font-size: 0.95rem;
+  background-color: #f9f9f9;
+  /* Fondo muy sutil para inputs */
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background-color: #fff;
+  border-color: #1a237e;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Diseño de dos columnas para los asesores */
+.row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .row-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Separador sutil */
+.divider {
+  border: 0;
+  height: 1px;
+  background: #eee;
+  margin: 30px 0;
+}
+
+/* Botón principal (Estilo uniforme con tu botón "Subir protocolo") */
+.btn-submit {
+  background-color: #1a237e;
+  /* Mismo color azul/morado de tu captura */
+  color: white;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+.btn-submit:hover {
+  background-color: #0d1b60;
+  transform: translateY(-1px);
+}
+
+small {
+  color: #888;
+  margin-top: 5px;
+  display: block;
+}

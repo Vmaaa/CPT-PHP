@@ -1,0 +1,41 @@
+#protocol-container {
+  max-width: 800px;
+  /* Evita que se estire demasiado en pantallas grandes */
+  margin: 40px auto;
+  /* Centra el contenedor horizontalmente */
+  padding: 40px;
+  background-color: #fff;
+  /* Fondo blanco (asegura contraste si el fondo general es gris) */
+  border-radius: 12px;
+  /* Bordes redondeados modernos */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  /* Sombra suave para profundidad */
+  text-align: center;
+  /* Centra el texto y botones internos */
+  min-height: 300px;
+  /* Altura mínima para que no se vea aplastado */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Centra verticalmente el contenido */
+  align-items: center;
+}
+
+#protocol-container h3,
+#protocol-container h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+#protocol-container p {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 1.1em;
+}
+
+#protocol-container button,
+#protocol-container .btn {
+  padding: 10px 25px;
+  font-size: 1rem;
+}

@@ -6,12 +6,6 @@ require_once dirname(__DIR__, 4) . "/config/cors.php";
 require_once dirname(__DIR__, 4) . "/utils/token/pre_validate.php";
 require_once dirname(__DIR__, 4) . "/functions/serverSpecifics.php";
 
-/* ===== Validación de sesión ===== */
-if (!$AUTH || $AUTH['acco_role'] !== 'professor') {
-  http_response_code(403);
-  echo json_encode(['error' => 'Acceso denegado']);
-  exit;
-}
 
 $DB = ServerSpecifics::getInstance()->fnt_getDBConnection();
 

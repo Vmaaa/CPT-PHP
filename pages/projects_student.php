@@ -13,6 +13,7 @@ $pageScript = "protocolo.js";
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
   <title><?= $pageTitle ?> - <?= $SYSTEM_NAME ?></title>
+  <link rel="stylesheet" href="/CPT/assets/css/pages/projects_student.css">
 </head>
 
 <body>
@@ -20,11 +21,14 @@ $pageScript = "protocolo.js";
     <?php require_once __DIR__ . '/../inc/inc_sidebar.php'; ?>
 
     <div class="main-content">
-      <main class="main-content-inner" style="padding:20px;">
-        <h1><?= $pageTitle ?></h1>
+      <main class="main-content-inner" style="padding: 20px;">
+        <h1 style="margin-bottom: 30px;"><?= $pageTitle ?></h1>
 
         <div id="protocol-container">
-          <div class="loading">Cargando información...</div>
+          <div class="loading">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Cargando información...</p>
+          </div>
         </div>
 
       </main>

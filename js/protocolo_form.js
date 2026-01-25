@@ -43,7 +43,7 @@ async function submitProtocol(e) {
   const data = new FormData(form);
 
   if (data.get("advisor_1") === data.get("advisor_2")) {
-    msg.innerText = "Los asesores deben ser distintos";
+    Swal.fire("Error", "Los asesores deben ser distintos", "error");
     return;
   }
 
@@ -57,13 +57,21 @@ async function submitProtocol(e) {
 
     if (!res.ok) throw result;
 
-    msg.innerText = "Protocolo registrado correctamente";
-    form.reset();
     if (result.success) {
-      window.location.href = "/CPT/pages/projects_student.php";
-      return;
+      Swal.fire({
+        title: "¡Registrado!",
+        text: "Tu protocolo se ha subido correctamente.",
+        icon: "success",
+        confirmButtonText: "Continuar",
+        confirmButtonColor: "#1a237e",
+      }).then((result) => {
+        if (result.isConfirmed || result.isDismissed) {
+          window.location.href = "/CPT/pages/projects_student.php";
+        }
+      });
     }
   } catch (err) {
-    msg.innerText = err.error || "Error al registrar protocolo";
+    console.error(err);
+    Swal.fire("Error", err.error || "Error al registrar protocolo", "error");
   }
 }
