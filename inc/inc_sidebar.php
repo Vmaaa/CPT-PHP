@@ -4,7 +4,7 @@ $activePage = $activePage ?? '';
 
 $advisedModule   = ['ASESORADOS' => ['url' => 'pages/advised.php',  'icon' => 'fas fa-user-friends',   'label' => 'Asesorados']];
 $revisionModule  = ['REVISIONES' => ['url' => 'pages/revisions.php', 'icon' => 'fas fa-check-double',   'label' => 'Revisiones']];
-$projectModuleProfessor   = ['PROYECTO_P'  => ['url' => 'pages/projects.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyectos']];
+$projectModuleProfessor   = ['PROYECTO_P'  => ['url' => 'pages/projects_professor.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyectos']];
 $projectModuleStudent = ['PROYECTO_S'  => ['url' => 'pages/projects_student.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyecto']];
 $classModuleAdmin        = ['CLASES_A'     => ['url' => 'pages/classes_admin.php',   'icon' => 'fas fa-school', 'label' => 'Clases']];
 $classModuleProfessor     = ['CLASES_P'     => ['url' => 'pages/classes.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
