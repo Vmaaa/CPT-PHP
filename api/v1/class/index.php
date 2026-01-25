@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $types .= 'i';
   }
 
-  $query = "SELECT * FROM class";
+  $query = "SELECT c.*, ca.career FROM class c INNER join career ca on c.id_career = ca.id_career";
 
   if ($conds) {
     $query .= " WHERE " . implode(" AND ", $conds);
@@ -69,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   while ($row = mysqli_fetch_assoc($result)) {
     $row['professors'] = [];
     $row['students'] = [];
+    $row['assigments'] = [];
     $classes[$row['id_class']] = $row;
   }
 
@@ -94,6 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $students_data = json_decode($response, true);
     foreach ($students_data['data'] as $stud) {
       $class['students'][] = $stud;
+    }
+    //petición a la api de assigments
+    $ch = curl_init($API_URL . "/class/assigment/?id_class=" . $id_class);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
+    ]);
+    $response = curl_exec($ch);
+    $assigments_data = json_decode($response, true);
+    foreach ($assigments_data['data'] as $assig) {
+      $class['assigments'][] = $assig;
     }
   }
 

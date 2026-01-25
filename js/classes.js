@@ -115,11 +115,6 @@ async function renderClasses(classes) {
   });
 }
 
-function getCareerNameById(careers, idCareer) {
-  const career = careers.find((c) => c.id_career === idCareer);
-  return career ? career.career : "Desconocida";
-}
-
 async function createClassCard(cls) {
   const card = document.createElement("div");
   card.className = "class-card";
@@ -155,9 +150,7 @@ async function createClassCard(cls) {
   card.innerHTML = `
     <div class="class-card-header">
       <h3>${cls.name}</h3>
-      <span class="career">Carrera : ${
-    getCareerNameById(careers, cls.id_career)
-  }</span>
+      <span class="career">Carrera : ${cls.career}</span>
     </div>
 
     <div class="class-card-body">

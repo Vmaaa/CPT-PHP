@@ -37,7 +37,8 @@
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: 0.25rem 1rem;
+  margin-bottom: 2rem;
+  padding: 0.55rem 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
@@ -90,4 +91,20 @@
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   background: white;
+}
+
+.text-muted {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+#current-assignment-file {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+input[type="file"] {
+  padding: 6px;
 }

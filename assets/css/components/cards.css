@@ -70,6 +70,12 @@
   font-weight: 500;
 }
 
+.name-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .name-subtitle {
   font-size: 12px;
   color: #777;

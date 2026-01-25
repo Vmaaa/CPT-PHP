@@ -53,3 +53,9 @@
   color: var(--text-secondary);
   cursor: not-allowed;
 }
+
+.back-button {
+  background: transparent;
+  color: var(--primary);
+  font-size: 2rem;
+}

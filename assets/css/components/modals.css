@@ -38,6 +38,12 @@
   gap: 10px;
 }
 
+.modal-body label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
+
 .modal-close {
   background: none;
   border: none;
