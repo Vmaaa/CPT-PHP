@@ -118,7 +118,5 @@ input[type="file"] {
 
 .checkbox input[type="checkbox"] {
   accent-color: var(--primary);
-  v width: 1.1em;
-  height: 1.1em;
-  margin: 0;
+  margin-right: 10px;
 }

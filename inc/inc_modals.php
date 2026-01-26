@@ -181,4 +181,63 @@
       </button>
     </div>
   </div>
+</div>}
+<div id="stage-modal-backdrop" class="modal-backdrop" style="display:none;">
+  <div class="modal">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h3 id="stage-modal-title">Nueva etapa</h3>
+      <button class="modal-close" onclick="closeStageModal()">×</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <form id="stage-form">
+
+        <input type="hidden" id="id_calendary">
+
+        <div class="form-group">
+          <label for="stage_type">Etapa</label>
+          <select id="stage_type" class="form-select" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="id_career">Carrera</label>
+          <select id="id_career" class="form-select" required></select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="start_date">Fecha inicio</label>
+            <input type="date" id="start_date" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="end_date">Fecha fin</label>
+            <input type="date" id="end_date" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group checkbox">
+          <label>
+            <input type="checkbox" id="spring_semester">
+            Semestre de primavera
+          </label>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeStageModal()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" form="stage-form">
+        Guardar
+      </button>
+    </div>
+
+  </div>
 </div>

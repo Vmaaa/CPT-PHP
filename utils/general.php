@@ -70,3 +70,36 @@ function  fnt_validateSchoolIDNumber_v001($id_number)
 {
   return preg_match('/^(20[2-9][0-9])\d{6}$/', $id_number) === 1;
 }
+
+
+function getHumanizedType($type)
+{
+  $types = [
+    'upload_protocols' => 'Subir protocolos (1ra fase)',
+    'assign_reviewers' => 'Asignar revisores',
+    'judge_protocols' => 'Juzgar protocolos (1ra fase)',
+    're-upload_protocols' => 'Re-subir protocolos (1ra fase)',
+    'select_protocols' => 'Seleccionar protocolos para presentación final (1ra fase)',
+    'protocol_presentations' => 'Presentaciones de protocolos (1ra fase)',
+    'grade_protocols' => 'Calificar presentaciones de protocolos (1ra fase)',
+    'second_protocol_presentations' => 'Presentaciones de protocolos (2da fase)',
+    'grade_second_protocols' => 'Calificar presentaciones de protocolos (2da fase)'
+  ];
+  return $types[$type] ?? null;
+}
+
+function getKeyHumanizedType($humanizedType)
+{
+  $types = [
+    'Subir protocolos (1ra fase)' => 'upload_protocols',
+    'Asignar revisores' => 'assign_reviewers',
+    'Juzgar protocolos (1ra fase)' => 'judge_protocols',
+    'Re-subir protocolos (1ra fase)' => 're-upload_protocols',
+    'Seleccionar protocolos para presentación final (1ra fase)' => 'select_protocols',
+    'Presentaciones de protocolos (1ra fase)' => 'protocol_presentations',
+    'Calificar presentaciones de protocolos (1ra fase)' => 'grade_protocols',
+    'Presentaciones de protocolos (2da fase)' => 'second_protocol_presentations',
+    'Calificar presentaciones de protocolos (2da fase)' => 'grade_second_protocols'
+  ];
+  return $types[$humanizedType] ?? null;
+}
