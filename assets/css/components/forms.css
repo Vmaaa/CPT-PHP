@@ -108,3 +108,17 @@
 input[type="file"] {
   padding: 6px;
 }
+
+
+.checkbox {
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.checkbox input[type="checkbox"] {
+  accent-color: var(--primary);
+  v width: 1.1em;
+  height: 1.1em;
+  margin: 0;
+}

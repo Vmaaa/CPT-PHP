@@ -113,7 +113,12 @@
         class="form-control"
         accept="application/pdf" />
 
-      <small class="text-muted">
+      <div id="delete-assignment-file-container" style="margin-top:8px;">
+        <input type="checkbox" id="delete-assignment-file" class="checkbox" />
+        <label for="delete-assignment-file">Eliminar archivo actual</label>
+      </div>
+
+      <small class="text-muted" style="display:block; margin-top:8px;">
         En edición, subir un archivo reemplazará el actual
       </small>
     </div>

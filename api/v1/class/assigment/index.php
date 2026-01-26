@@ -49,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $data = [];
 
   while ($row = mysqli_fetch_assoc($result)) {
+    if ($AUTH['acco_role'] !== 'student') {
+      $row['can_be_edited'] = $row['id_professor'] == $AUTH['id_professor'];
+    }
     $data[] = $row;
   }
 
@@ -57,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if ($AUTH['acco_role'] !== 'professor' && $AUTH['acco_role'] !== 'admin') {
+  if ($AUTH['acco_role'] === 'student') {
     http_response_code(403);
     echo json_encode(['error' => 'No tienes permiso para crear una asignación']);
     exit;
@@ -163,4 +166,195 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     echo json_encode(['error' => 'Error al crear la asignación']);
   }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+  $_PUT = fnt_parseInputMultiPart();
+
+  if ($AUTH['acco_role'] === 'student') {
+    http_response_code(403);
+    echo json_encode(['error' => 'No tienes permiso para editar una asignación']);
+    exit;
+  }
+
+  $id_assigment = $_PUT['id_assigment'] ?? null;
+  $title        = $_PUT['title'] ?? null;
+  $description  = $_PUT['description'] ?? null;
+  $due_date     = $_PUT['due_date'] ?? null;
+  $file         = $_PUT['file'] ?? null;
+
+  $remove_url = isset($_PUT['remove_url'])
+    ? filter_var($_PUT['remove_url'], FILTER_VALIDATE_BOOLEAN)
+    : false;
+
+  if (empty($id_assigment)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'id_assigment es requerido']);
+    exit;
+  }
+
+  /* Obtener asignación actual */
+  $stmt = mysqli_prepare($DB_T, "SELECT * FROM assigment WHERE id_assigment = ?");
+  mysqli_stmt_bind_param($stmt, 'i', $id_assigment);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  if (mysqli_num_rows($result) === 0) {
+    http_response_code(404);
+    echo json_encode(['error' => 'La asignación no existe']);
+    exit;
+  }
+
+  $assigment = mysqli_fetch_assoc($result);
+
+  if ($assigment['id_professor'] != $AUTH['id_professor']) {
+    http_response_code(403);
+    echo json_encode([
+      'error' => 'No tienes permiso para editar esta asignación'
+    ]);
+    exit;
+  }
+
+  if ($remove_url && $file !== null) {
+    http_response_code(400);
+    echo json_encode([
+      'error' => 'No se puede subir un nuevo archivo y eliminar url al mismo tiempo'
+    ]);
+    exit;
+  }
+
+  /* Campos a actualizar */
+  $conds  = [];
+  $params = [];
+  $types  = '';
+
+  if ($title !== null) {
+    if (!fnt_validateString_v001($title, 1, 240)) {
+      http_response_code(400);
+      echo json_encode(['error' => 'Título inválido']);
+      exit;
+    }
+    $conds[] = 'title = ?';
+    $params[] = $title;
+    $types .= 's';
+  }
+
+  if ($description !== null) {
+    $conds[] = 'description = ?';
+    $params[] = $description;
+    $types .= 's';
+  }
+
+  if ($due_date !== null) {
+    if (!fnt_validateDateTime_v001($due_date)) {
+      http_response_code(400);
+      echo json_encode(['error' => 'Fecha de entrega inválida']);
+      exit;
+    }
+    $conds[] = 'due_date = ?';
+    $params[] = $due_date;
+    $types .= 's';
+  }
+
+  /* Subir nuevo archivo */
+  if ($file !== null) {
+    $tmpPath = tempnam(sys_get_temp_dir(), 'pdf_');
+    file_put_contents($tmpPath, $file);
+
+    if (!is_file($tmpPath) || filesize($tmpPath) === 0) {
+      unlink($tmpPath);
+      http_response_code(400);
+      echo json_encode(['error' => 'Error al subir el archivo']);
+      return;
+    }
+
+    if (filesize($tmpPath) > 5 * 1024 * 1024) {
+      unlink($tmpPath);
+      http_response_code(400);
+      echo json_encode(['error' => 'Archivo demasiado grande']);
+      return;
+    }
+
+    $file_name = uniqid('assignment_', true) . '.pdf';
+
+    $file_path =
+      $UPLOAD_DIR
+      . '/class_' . $assigment['id_class']
+      . '/professor_' . $AUTH['id_professor']
+      . '/' . $file_name;
+
+    $dir = dirname($file_path);
+
+    if (!is_dir($dir) && !mkdir($dir, 0755, true)) {
+      unlink($tmpPath);
+      http_response_code(500);
+      echo json_encode(['error' => 'Error al crear el directorio']);
+      return;
+    }
+
+    if (!rename($tmpPath, $file_path)) {
+      unlink($tmpPath);
+      http_response_code(500);
+      echo json_encode(['error' => 'Error al guardar el archivo']);
+      return;
+    }
+
+    /* ===== URL & DB ===== */
+
+    $file_url = $API_URL . '/uploads/assigments/?' . http_build_query([
+      'file_name'    => $file_name,
+      'id_class'     => $assigment['id_class'],
+      'id_professor' => $AUTH['id_professor']
+    ]);
+
+    $conds[]  = 'file_url = ?';
+    $params[] = $file_url;
+    $types   .= 's';
+
+    $remove_url = true;
+  }
+
+  /* Eliminar archivo existente */
+  if ($remove_url && $assigment['file_url']) {
+    $parsed = parse_url($assigment['file_url']);
+    parse_str($parsed['query'] ?? '', $q);
+
+    if (isset($q['file_name'], $q['id_class'], $q['id_professor'])) {
+      $old_path = $UPLOAD_DIR
+        . '/class_' . $q['id_class']
+        . '/professor_' . $q['id_professor']
+        . '/' . $q['file_name'];
+
+      if (file_exists($old_path)) {
+        unlink($old_path);
+      }
+    }
+
+    if ($file === null) {
+      $conds[] = 'file_url = NULL';
+    }
+  }
+
+  if (count($conds) === 0) {
+    http_response_code(200);
+    echo json_encode(['message' => 'No hay campos para actualizar']);
+    exit;
+  }
+
+  $params[] = $id_assigment;
+  $types   .= 'i';
+
+  $sql = "UPDATE assigment SET " . implode(', ', $conds) . " WHERE id_assigment = ?";
+  $stmt = mysqli_prepare($DB_T, $sql);
+  mysqli_stmt_bind_param($stmt, $types, ...$params);
+  try {
+    mysqli_stmt_execute($stmt);
+  } catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al actualizar la asignación']);
+    exit;
+  }
+
+  http_response_code(200);
+  echo json_encode(['message' => 'Asignación actualizada exitosamente']);
 }
