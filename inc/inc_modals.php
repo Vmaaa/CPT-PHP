@@ -148,7 +148,11 @@
 
     <div class="modal-body">
       <input type="hidden" id="edit-students-class-id" />
+      <p> Los alumnos seleccionados en "Alumnos actuales" permanecerán en la clase </p>
+      <p> Los alumnos seleccionados en "Alumnos disponibles" serán agregados a la clase </p>
+      <p> El total de alumnos seleccionados será el nuevo conjunto de alumnos de la clase </p>
 
+      <small class"text-muted" style="display: block;"> Presiona Ctrl (o Cmd en Mac) para seleccionar múltiples alumnos </small>
       <label>Alumnos actuales</label>
       <select
         id="current-students"

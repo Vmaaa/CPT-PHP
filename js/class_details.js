@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     SwalMessage({
       tile: "Error",
-      text: "Suceció un error al cargar la clase",
+      text: "Sucedió un error al cargar la clase",
       icon: "error",
     });
     setTimeout(() => {
@@ -378,7 +378,7 @@ async function submitAssignment() {
   if (!response.ok) {
     SwalMessage({
       tile: "Error",
-      text: "Suceció un error al guardar la asignación",
+      text: "Sucedio un error al guardar la asignación",
       icon: "error",
     });
     return;
@@ -463,6 +463,7 @@ async function openEditClassStudentsModal(classId, careerId) {
     const option = document.createElement("option");
     option.value = student.id_student;
     option.textContent = `${student.name} – ${student.school_id_number}`;
+    option.selected = true;
     currentSelect.appendChild(option);
   });
 
@@ -477,8 +478,81 @@ async function openEditClassStudentsModal(classId, careerId) {
     const option = document.createElement("option");
     option.value = student.id_student;
     option.textContent = `${student.name} – ${student.school_id_number}`;
+    option.selected = false;
     select.appendChild(option);
   });
 
   window.openModal("modal-edit-students");
+}
+
+async function saveClassStudents() {
+  const classId = document.getElementById("edit-students-class-id").value;
+  const currentSelect = document.getElementById("current-students");
+  const currentStudentIds = Array.from(currentSelect.options).map(
+    (option) => option.selected ? option.value : null,
+  );
+  const availableSelect = document.getElementById("available-students");
+  const availableStudentIds = Array.from(availableSelect.options).map(
+    (option) => option.selected ? option.value : null,
+  );
+  const allStudentsIds = currentStudentIds.concat(availableStudentIds);
+  const selectedStudentIds = allStudentsIds.filter((id) => id !== null);
+  const selectedStudentInformation = Array.from(currentSelect.options)
+    .concat(Array.from(availableSelect.options))
+    .filter((option) => option.selected)
+    .map((option) => ({
+      id_student: option.value,
+      name: option.textContent,
+    }));
+
+  const confirmed = await SwalConfirm({
+    title: "Confirmar cambios",
+    text: "Los alumnos seleccionados son los siguientes: " +
+      selectedStudentInformation
+        .map((s) => s.name)
+        .join(", "),
+    icon: "question",
+    confirmButtonText: "Confirmar",
+    cancelButtonText: "Cancelar",
+  });
+
+  if (!confirmed) {
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("id_class", classId);
+  selectedStudentIds.forEach((id) => {
+    formData.append("students_ids[]", id);
+  });
+
+  const response = await CookieManager.fetchWithAuth(
+    CLASS_STUDENTS_API_URL,
+    {
+      method: "PUT",
+      body: formData,
+    },
+  );
+
+  if (!response.ok) {
+    SwalMessage({
+      tile: "Error",
+      text: "Sucedió un error al guardar los alumnos de la clase",
+      icon: "error",
+    });
+    return;
+  }
+
+  SwalMessage({
+    tile: "Éxito",
+    text: "Alumnos de la clase actualizados correctamente",
+    icon: "success",
+  });
+  window.closeModal("modal-edit-students");
+  //reload class details
+  const urlParams = new URLSearchParams(window.location.search);
+  const classIdParam = urlParams.get("id_class");
+  if (classIdParam) {
+    await loadSpecificClass(classIdParam);
+  }
 }
