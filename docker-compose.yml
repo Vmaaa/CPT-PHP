@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # --- SERVICIO WEB (TU PHP) ---
+  app:
+    build: .
+    container_name: cpt-app
+    restart: always
+    ports:
+      - "8080:80"  # Accederás en tu navegador como localhost:8080
+    environment:
+      # --- AQUÍ CONECTAMOS CON TU CLASE ServerSpecifics ---
+      
+      # 1. Base de datos (Coinciden con tus getenv de DB)
+      - DB_HOST=db              # ¡IMPORTANTE! 'db' es el nombre del servicio de abajo
+      - DB_NAME=cpt_db          # El nombre que quieras para tu BD
+      - DB_USER=cpt_user        # Usuario para la conexión
+      - DB_PASSWORD=cpt_pass    # Contraseña para la conexión
+      
+      # 2. URLs y Secretos (Coinciden con tus otros getenv)
+      - API_URL=http://localhost:8080/api/  # Ajusta según tu ruta real
+      - WEBPAGE_URL=http://localhost:8080/
+      - SYSTEM_SECRET=MiSecretoSuperSeguro123
+
+    depends_on:
+      - db
+
+  # --- SERVICIO BASE DE DATOS ---
+  db:
+    image: mysql:8.0
+    container_name: cpt-db
+    restart: always
+    environment:
+      # Estos datos deben coincidir con los de arriba
+      MYSQL_DATABASE: cpt_db
+      MYSQL_USER: cpt_user
+      MYSQL_PASSWORD: cpt_pass
+      MYSQL_ROOT_PASSWORD: root_super_secret
+    volumes:
+      # A: Persistencia (para no perder datos al apagar)
+      - db_data:/var/lib/mysql
+      
+      # B: CARGA AUTOMÁTICA DE TU SQL (Aquí ocurre la magia)
+      # Mapeamos tu carpeta local al directorio de inicio de MySQL
+      - ./db_init:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:
