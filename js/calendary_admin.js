@@ -91,6 +91,9 @@ function createStageCard(stage) {
     stage.first_half ? "Semestre I" : "Semestre II"
   }</div>
     <div class="stage-actions">
+      <button class="btn btn-error" onclick='deleteStage(${stage.id_calendar_events})'>
+        Eliminar
+      </button>
       <button class="btn btn-primary" onclick='editStage(${
     JSON.stringify(stage)
   })'>
@@ -106,7 +109,7 @@ function createStageCard(stage) {
 ======================== */
 function openStageModal() {
   document.getElementById("stage-form").reset();
-  document.getElementById("id_calendary").value = "";
+  document.getElementById("id_calendar_events").value = "";
   document.getElementById("stage-modal-title").textContent = "Nueva etapa";
   document.getElementById("stage-modal-backdrop").style.display = "flex";
 }
@@ -114,9 +117,11 @@ function openStageModal() {
 function editStage(stage) {
   document.getElementById("stage-modal-title").textContent = "Editar etapa";
 
-  document.getElementById("id_calendary").value = stage.id_calendary;
+  document.getElementById("id_calendar_events").value = stage.id_calendar_events;
   document.getElementById("stage_type").value = stage.stage;
+  document.getElementById("stage_type").disabled = true;
   document.getElementById("id_career").value = stage.id_career;
+  document.getElementById("id_career").disabled = true;
   document.getElementById("start_date").value = stage.start_date.split(" ")[0];
   document.getElementById("end_date").value = stage.end_date.split(" ")[0];
   document.getElementById("first_half").value = stage.first_half;
@@ -138,7 +143,7 @@ async function saveStage(e) {
   e.preventDefault();
 
   const payload = {
-    id_calendary: document.getElementById("id_calendary").value || null,
+    id_calendar_events: document.getElementById("id_calendar_events").value || null,
     stage: document.getElementById("stage_type").value,
     id_career: document.getElementById("id_career").value,
     start_date: formatDateForDatabase(document.getElementById("start_date").value),
@@ -155,7 +160,7 @@ async function saveStage(e) {
   });
 
 
-  const method = payload.id_calendary ? "PUT" : "POST";
+  const method = payload.id_calendar_events ? "PUT" : "POST";
 
   const res = await CookieManager.fetchWithAuth(CALENDAR_API_URL, {
     method,
@@ -173,7 +178,7 @@ async function saveStage(e) {
     return;
   }
 
-  if (payload.id_calendary) {
+  if (payload.id_calendar_events) {
     SwalMessage({
       title: "Éxito",
       text: "Etapa actualizada correctamente",
@@ -189,6 +194,45 @@ async function saveStage(e) {
   }
 
   closeStageModal();
+  await loadCalendarStages();
+}
+
+async function deleteStage(id_calendar_events) {
+  const confirm = await SwalConfirm({
+    title: "¿Eliminar etapa?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+  });
+  
+  if (!confirm) return;
+
+  const formData = new FormData();
+  formData.append("id_calendar_events", id_calendar_events);
+
+  const res = await CookieManager.fetchWithAuth(CALENDAR_API_URL, {
+    method: "DELETE",
+    body: formData,
+  });
+  
+  const data = await res.json();
+
+  if (!res.ok) {
+    SwalMessage({
+      title: "Error",
+      text: data.error || "No se pudo eliminar la etapa",
+      icon: "error",
+    });
+    return;
+  }
+
+  SwalMessage({
+    title: "Éxito",
+    text: "Etapa eliminada correctamente",
+    icon: "success",
+  });
+  
   await loadCalendarStages();
 }
 

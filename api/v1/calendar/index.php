@@ -195,5 +195,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       echo json_encode(['error' => 'Error al crear la etapa']);
     }
+    exit;
+  }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+  $PUT = fnt_parseInputMultiPart();
+  $id_calendar_events = $PUT['id_calendar_events'] ?? null;
+  $start_date = $PUT['start_date'] ?? null;
+  $end_date = $PUT['end_date'] ?? null;
+  $year = $PUT['year'] ?? null;
+  $first_half = $PUT['first_half'] ?? null;
+
+  if (!$id_calendar_events) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Falta el campo id_calendar_events']);
+    exit;
+  }
+
+  $existing_event_query = "SELECT * FROM calendar_events WHERE id_calendar_events = ?";
+  $stmt = mysqli_prepare($DB_T, $existing_event_query);
+  mysqli_stmt_bind_param($stmt, 'i', $id_calendar_events);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  if (mysqli_num_rows($result) === 0) {
+    http_response_code(404);
+    echo json_encode(['error' => 'No se encontró la etapa especificada']);
+    exit;
+  }
+  $existing_event = mysqli_fetch_assoc($result);
+
+  if (($start_date && !fnt_validateDateTime_v001($start_date, 'Y-m-d')) || ($end_date && !fnt_validateDateTime_v001($end_date, 'Y-m-d'))) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Formato de fecha inválido. Se requiere YYYY-MM-DD HH:MM:SS']);
+    exit;
+  }
+
+  $fields = [];
+  $parameters = [];
+  $types = '';
+
+  if ($start_date) {
+    $fields[] = 'start_date = ?';
+    $parameters[] = $start_date . ' 00:00:00';
+    $types .= 's';
+  }
+  if ($end_date) {
+    $fields[] = 'end_date = ?';
+    $parameters[] = $end_date . ' 23:59:59';
+    $types .= 's';
+  }
+  if ($year) {
+    $fields[] = 'year = ?';
+    $parameters[] = $year;
+    $types .= 'i';
+  }
+  if ($first_half !== null) {
+    $fields[] = 'first_half = ?';
+    $parameters[] = $first_half;
+    $types .= 'i';
+  }
+
+  if (empty($fields)) {
+    http_response_code(200);
+    echo json_encode(['changes' => []]);
+    exit;
+  }
+
+  $parameters[] = $id_calendar_events;
+  $types .= 'i';
+
+  if (isOverlappingStage($existing_event['stage'], $existing_event['id_career'], $first_half ?? $existing_event['first_half'], $year ?? $existing_event['year'], $id_calendar_events)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Ya existe una etapa activa para esta carrera, semestre y año']);
+    exit;
+  }
+
+  $query = "UPDATE calendar_events SET " . implode(', ', $fields) . " WHERE id_calendar_events = ?";
+  $stmt = mysqli_prepare($DB_T, $query);
+  mysqli_stmt_bind_param($stmt, $types, ...$parameters);
+  try {
+    mysqli_stmt_execute($stmt);
+    http_response_code(200);
+    echo json_encode(['changes' => $fields]);
+  } catch (Exception $e) {
+    http_response_code(500);
+    if ($e->getCode() == 1452) {
+      echo json_encode(['error' => 'La carrera especificada no existe']);
+    } else {
+      echo json_encode(['error' => 'Error al actualizar la etapa']);
+    }
+    exit;
+  }
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+  $DELETE = fnt_parseInputMultiPart();
+  $id_calendar_events = $DELETE['id_calendar_events'] ?? null;
+  if (!$id_calendar_events) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Falta el campo id_calendar_events']);
+    exit;
+  }
+
+  $query = "DELETE FROM calendar_events WHERE id_calendar_events = ?";
+  $stmt = mysqli_prepare($DB_T, $query);
+  mysqli_stmt_bind_param($stmt, 'i', $id_calendar_events);
+  try {
+    mysqli_stmt_execute($stmt);
+    if (mysqli_stmt_affected_rows($stmt) > 0) {
+      http_response_code(200);
+      echo json_encode(['success' => 'Etapa eliminada exitosamente']);
+    } else {
+      http_response_code(404);
+      echo json_encode(['error' => 'No se encontró la etapa especificada']);
+    }
+  } catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al eliminar la etapa']);
   }
 }

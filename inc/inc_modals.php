@@ -195,7 +195,7 @@
     <div class="modal-body">
       <form id="stage-form">
 
-        <input type="hidden" id="id_calendary">
+        <input type="hidden" id="id_calendar_events">
 
         <div class="form-group">
           <label for="stage_type">Etapa</label>
