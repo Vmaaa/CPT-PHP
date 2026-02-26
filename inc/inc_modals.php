@@ -219,11 +219,12 @@
           </div>
         </div>
 
-        <div class="form-group checkbox">
-          <label>
-            <input type="checkbox" id="spring_semester">
-            Semestre de primavera
-          </label>
+        <div class="form-group">
+          <label for="first_half">Semestre:</label>
+          <select id="first_half" class="form-select" required>
+            <option value="1" selected>Semestre I</option>
+            <option value="0">Semestre II</option>
+          </select>
         </div>
 
       </form>

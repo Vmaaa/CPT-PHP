@@ -88,7 +88,7 @@ function createStageCard(stage) {
     <div class="stage-info"><b>Fin:</b> ${stage.end_date}</div>
     <div class="stage-info"><b>Año:</b> ${stage.year}</div>
     <div class="stage-info"><b>Semestre:</b> ${
-    stage.spring_semester ? "Primavera" : "Otoño"
+    stage.first_half ? "Semestre I" : "Semestre II"
   }</div>
     <div class="stage-actions">
       <button class="btn btn-primary" onclick='editStage(${
@@ -118,12 +118,11 @@ function editStage(stage) {
   document.getElementById("id_calendary").value = stage.id_calendary;
   document.getElementById("stage_type").value = stage.stage;
   document.getElementById("id_career").value = stage.id_career;
-  document.getElementById("start_date").value = stage.start_date;
-  document.getElementById("end_date").value = stage.end_date;
-  document.getElementById("spring_semester").checked =
-    stage.spring_semester == 1;
-
+  document.getElementById("start_date").value = stage.start_date.split(" ")[0];
+  document.getElementById("end_date").value = stage.end_date.split(" ")[0];
+  document.getElementById("first_half").value = stage.first_half;
   document.getElementById("stage-modal-backdrop").style.display = "flex";
+  console.log(stage);
 }
 
 function closeStageModal() {
@@ -144,15 +143,20 @@ async function saveStage(e) {
     id_career: document.getElementById("id_career").value,
     start_date: document.getElementById("start_date").value,
     end_date: document.getElementById("end_date").value,
-    spring_semester: document.getElementById("spring_semester").checked ? 1 : 0,
+    first_half: document.getElementById("first_half").value
   };
+
+  const formData = new FormData();
+  Object.entries(payload).forEach(([key, value]) => {
+    formData.append(key, value);
+  });
+
 
   const method = payload.id_calendary ? "PUT" : "POST";
 
   const res = await CookieManager.fetchWithAuth(CALENDAR_API_URL, {
     method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   const data = await res.json();
@@ -166,12 +170,22 @@ async function saveStage(e) {
     return;
   }
 
+  if (payload.id_calendary) {
+    SwalMessage({
+      title: "Éxito",
+      text: "Etapa actualizada correctamente",
+      icon: "success",
+    });
+  }
+    else {
+    SwalMessage({
+      title: "Éxito",
+      text: "Etapa creada correctamente",
+      icon: "success",
+  }  });
+  }
+
   closeStageModal();
   await loadCalendarStages();
 
-  SwalMessage({
-    title: "Éxito",
-    text: "Etapa guardada correctamente",
-    icon: "success",
-  });
 }

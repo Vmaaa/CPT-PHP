@@ -14,6 +14,23 @@ class ServerSpecifics
   // JWT specifics
   protected  $jwtDuration = 3600 * 24; // 24 hours
 
+  protected $stages = [
+    'upload_protocols' => 'Subir protocolos',
+    'assign_reviewers' => 'Asignar revisores',
+    'judge_protocols' => 'Aprobación de protocolos',
+    'second_upload_protocols' => 'Segundo intento de subir protocolos',
+    'second_assign_reviewers' => 'Segunda asignación de revisores',
+    'second_judge_protocols' => 'Segunda aprobación de protocolos',
+    'upload_final_documents' => 'Subir documentos finales',
+    'select_documents' => 'Seleccionar trabajos para presentación',
+    'documents_presentations' => 'Presentación de trabajos',
+    'grade_documents' => 'Calificar trabajos',
+    'second_upload_final_documents' => 'Segunda fase de subir documentos finales',
+    'second_select_documents' => 'Segunda fase de seleccionar trabajos para presentación',
+    'second_documents_presentations' => 'Segunda fase de presentación de trabajos',
+    'second_grade_documents' => 'Segunda fase de calificar trabajos',
+  ];
+
   private static $instance = null;
 
   private function __construct()
@@ -72,5 +89,10 @@ class ServerSpecifics
   function fnt_getSystemSecret(): string
   {
     return $this->SYSTEM_SECRET;
+  }
+
+  function fnt_getStages(): array
+  {
+    return $this->stages;
   }
 }
