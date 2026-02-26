@@ -219,12 +219,19 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="first_half">Semestre:</label>
-          <select id="first_half" class="form-select" required>
-            <option value="1" selected>Semestre I</option>
-            <option value="0">Semestre II</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_half">Año</label>
+            <input type="number" id="year" class="form-control" required min="2000" max="2100" value="<?php echo date('Y'); ?>">
+          </div>
+
+          <div class="form-group">
+            <label for="first_half">Semestre:</label>
+            <select id="first_half" class="form-select" required>
+              <option value="1" selected>Semestre I</option>
+              <option value="0">Semestre II</option>
+            </select>
+          </div>
         </div>
 
       </form>

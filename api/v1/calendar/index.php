@@ -66,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $query .= " WHERE " . implode(' AND ', $conditions);
   }
 
+  $query .= " ORDER BY ce.year DESC, ce.first_half DESC, ce.start_date DESC";
+
   $events = [];
   $stmt = mysqli_prepare($DB_T, $query);
   if (!empty($parameters)) {
@@ -119,13 +121,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $required_fields = ['stage', 'start_date', 'end_date', 'id_career', 'first_half', 'year'];
   $missing_fields = [];
   foreach ($required_fields as $field) {
-    if (!isset($_POST[$field]) || empty($_POST[$field])) {
+    if ($_POST[$field] === null) {
       $missing_fields[] = $field;
     }
   }
   if ($missing_fields) {
     http_response_code(400);
-    echo json_encode(['error' => 'Faltan campos requeridos: ' . implode(', ', $missing_fields)]);
+    echo json_encode(['error' => 'Faltan campos requeridos: ' . implode(', ', $missing_fields), 'provided_fields' => $_POST]);
+    exit;
+  }
+
+  if (!fnt_validateDateTime_v001($start_date, 'Y-m-d') || !fnt_validateDateTime_v001($end_date, 'Y-m-d')) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Formato de fecha inválido. Se requiere YYYY-MM-DD HH:MM:SS']);
+    exit;
+  }
+
+  if (!in_array($stage, $SS->fnt_getStagesKeys())) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Etapa inválida: ' . $stage . '. Etapas válidas: ' . implode(', ', $SS->fnt_getStagesKeys())]);
+    exit;
+  }
+
+  if ($year < 2000 || $year > 2100) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Año inválido. Se requiere un año entre 2000 y 2100']);
+    exit;
+  }
+
+  if ($first_half != 0 && $first_half != 1) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Valor inválido para first_half. Se requiere 0 o 1']);
+    exit;
+  }
+
+  if (strtotime($start_date) >= strtotime($end_date)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'La fecha de inicio debe ser anterior a la fecha de fin']);
     exit;
   }
 
@@ -134,6 +166,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['error' => 'Ya existe una etapa activa para esta carrera, semestre y año']);
     exit;
   }
+
+  $start_date .= ' 00:00:00';
+  $end_date .= ' 23:59:59';
 
   $query = "INSERT INTO calendar_events (stage, start_date, end_date, id_career, first_half, year) VALUES (?, ?, ?, ?, ?, ?)";
   $stmt = mysqli_prepare($DB_T, $query);
@@ -154,6 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['success' => 'Etapa creada exitosamente', 'id_calendar_events' => $created_id]);
   } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Error al crear la etapa']);
+    // foreign key for id_career, error code 
+    if ($e->getCode() == 1452) {
+      echo json_encode(['error' => 'La carrera especificada no existe']);
+    } else {
+      echo json_encode(['error' => 'Error al crear la etapa']);
+    }
   }
 }

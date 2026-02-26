@@ -108,7 +108,6 @@ function openStageModal() {
   document.getElementById("stage-form").reset();
   document.getElementById("id_calendary").value = "";
   document.getElementById("stage-modal-title").textContent = "Nueva etapa";
-
   document.getElementById("stage-modal-backdrop").style.display = "flex";
 }
 
@@ -121,6 +120,7 @@ function editStage(stage) {
   document.getElementById("start_date").value = stage.start_date.split(" ")[0];
   document.getElementById("end_date").value = stage.end_date.split(" ")[0];
   document.getElementById("first_half").value = stage.first_half;
+  document.getElementById("year").value = stage.year;
   document.getElementById("stage-modal-backdrop").style.display = "flex";
   console.log(stage);
 }
@@ -141,14 +141,17 @@ async function saveStage(e) {
     id_calendary: document.getElementById("id_calendary").value || null,
     stage: document.getElementById("stage_type").value,
     id_career: document.getElementById("id_career").value,
-    start_date: document.getElementById("start_date").value,
-    end_date: document.getElementById("end_date").value,
+    start_date: formatDateForDatabase(document.getElementById("start_date").value),
+    end_date: formatDateForDatabase(document.getElementById("end_date").value),
+    year: document.getElementById("year").value,
     first_half: document.getElementById("first_half").value
   };
 
   const formData = new FormData();
   Object.entries(payload).forEach(([key, value]) => {
-    formData.append(key, value);
+    if (value !== null) {
+      formData.append(key, value);
+    }
   });
 
 
@@ -182,10 +185,10 @@ async function saveStage(e) {
       title: "Éxito",
       text: "Etapa creada correctamente",
       icon: "success",
-  }  });
+    });
   }
 
   closeStageModal();
   await loadCalendarStages();
-
 }
+

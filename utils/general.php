@@ -21,10 +21,10 @@ function fnt_validateString_v001($value, $min, $max)
   return $len >= $min && $len <= $max;
 }
 
-function fnt_validateDateTime_v001($datetime)
+function fnt_validateDateTime_v001($datetime, $format = 'Y-m-d H:i:s')
 {
-  $d = DateTime::createFromFormat('Y-m-d H:i:s', $datetime);
-  return $d && $d->format('Y-m-d H:i:s') === $datetime;
+  $d = DateTime::createFromFormat($format, $datetime);
+  return $d && $d->format($format) === $datetime;
 }
 
 

@@ -95,4 +95,9 @@ class ServerSpecifics
   {
     return $this->stages;
   }
+
+  function fnt_getStagesKeys(): array
+  {
+    return array_keys($this->stages);
+  }
 }
