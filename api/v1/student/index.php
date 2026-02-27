@@ -16,13 +16,15 @@ require_once __DIR__ . "/../../../utils/input/input_parser.php";
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $without_class = isset($_GET['without_class']) ? (int) $_GET['without_class'] : 0;
   $id_career = isset($_GET['id_career']) ? (int) $_GET['id_career'] : null;
+  $id_class = isset($_GET['id_class']) ? (int) $_GET['id_class'] : null;
+  $acco_id = isset($_GET['acco_id']) ? (int) $_GET['acco_id'] : null;
 
   $conds = [];
   $params = [];
   $types = '';
 
 
-  $query = "SELECT s.* FROM student s";
+  $query = "SELECT s.*, c.name as class_name, ca.career FROM student s LEFT JOIN class c ON s.id_class = c.id_class LEFT JOIN career ca ON s.id_career = ca.id_career";
 
   if ($without_class === 1) {
     $conds[] = "s.id_class IS NULL";
@@ -31,6 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   if ($id_career !== null) {
     $conds[] = "s.id_career = ?";
     $params[] = $id_career;
+    $types .= 'i';
+  }
+
+  if ($id_class !== null) {
+    $conds[] = "s.id_class = ?";
+    $params[] = $id_class;
+    $types .= 'i';
+  }
+
+  if ($acco_id !== null) {
+    $conds[] = "s.acco_id = ?";
+    $params[] = $acco_id;
     $types .= 'i';
   }
 

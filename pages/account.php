@@ -11,81 +11,91 @@ $pageScript = "account.js";
 
 <head>
   <?php require_once __DIR__ . '/../inc/inc_head.php'; ?>
-  <title><?= $pageTitle ?> -
-    <?= $SYSTEM_NAME ?>
-  </title>
+  <title><?= $pageTitle ?> - <?= $SYSTEM_NAME ?></title>
 </head>
 
 <body>
 
   <div id="app-container" class="app-container">
     <?php require_once __DIR__ . '/../inc/inc_sidebar.php'; ?>
+
     <div class="main-content">
-      <main class="main-content-inner" style="padding: 20px;">
-        <div style="margin-bottom: 30px;">
-          <h1 style="font-size: 24px; font-weight: bold;"><?php echo $pageTitle; ?></h1>
+      <main class="main-content-inner" style="padding:20px;">
+
+        <div style="margin-bottom:25px;">
+          <h1 style="font-size:24px;font-weight:bold;">
+            <?= $pageTitle ?>
+          </h1>
         </div>
-        <div class="form-container">
+
+        <div class="form-container" id="account-card">
+
+          <!-- Banner ADMIN -->
+          <div id="admin-banner"
+            style="display:none;margin-bottom:20px;padding:10px;"
+            class="badge badge-info">
+            Administrador del Sistema
+          </div>
+
           <form class="account-form">
-            <div class="form-group">
-              <label for="name">Nombre</label>
-              <input type="text" id="name" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label for="role">Rol</label>
-              <input type="text" id="role" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label for="status">Estado</label>
-              <input type="text" id="status" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label for="curp">CURP</label>
-              <input type="text" id="curp" class="form-control" readonly>
-            </div>
-            <div id="teacher-fields" style="display: none;">
+
+            <!-- ================= CUENTA ================= -->
+            <div style="margin-bottom:30px;">
+              <h3 style="margin-bottom:15px;">Información de la Cuenta</h3>
+
               <div class="form-group">
-                <label for="academia">Academia</label>
+                <label>Email</label>
+                <input type="email" id="email" class="form-control" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Rol</label>
+                <input type="text" id="role" class="form-control" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Estado</label>
+                <input type="text" id="status" class="form-control" readonly>
+              </div>
+            </div>
+
+            <!-- ================= PROFESSOR / ADMIN ================= -->
+            <div id="teacher-fields" style="display:none;margin-bottom:30px;">
+              <h3 style="margin-bottom:15px;">Información Académica</h3>
+
+              <div class="form-group">
+                <label>Academia</label>
                 <input type="text" id="academia" class="form-control" readonly>
               </div>
+
               <div class="form-group">
-                <label for="level_of_education">Nivel de Educación</label>
+                <label>Nivel de Educación</label>
                 <input type="text" id="level_of_education" class="form-control" readonly>
               </div>
-              <div class="form-group">
-                <label for="is_president">¿Es Presidente?</label>
-                <input type="text" id="is_president" class="form-control" readonly>
-              </div>
-              <div class="form-group">
-                <label for="is_advisor">¿Es Asesor?</label>
-                <input type="text" id="is_advisor" class="form-control" readonly>
+
+              <div style="margin-top:15px;">
+                <span id="badge-president" class="badge"></span>
+
+                <span id="badge-advisor" class="badge"></span>
               </div>
             </div>
-            <div id="student-fields" style="display: none;">
-              <div class="form-group">
-                <label for="school_id_number">Matrícula</label>
-                <input type="text" id="school_id_number" class="form-control" readonly>
-              </div>
-              <div class="form-group">
-                <label for="id_career">ID Carrera</label>
-                <input type="text" id="id_career" class="form-control" readonly>
-              </div>
-              <div class="form-group">
-                <label for="id_class">ID Clase</label>
-                <input type="text" id="id_class" class="form-control" readonly>
-              </div>
+
+            <!-- ================= STUDENTS ================= -->
+            <div id="student-fields" style="display:none;">
+              <h3 style="margin-bottom:15px;">Estudiantes Asociados</h3>
+
+              <div id="students-container"></div>
             </div>
+
           </form>
         </div>
-      </main>
 
+      </main>
     </div>
   </div>
+
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
+  <script src="/assets/js/account.js"></script>
 </body>
 
 </html>

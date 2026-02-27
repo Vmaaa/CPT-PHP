@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 $AVALIABLE_METHODS = ['GET', 'PUT', 'DELETE'];
 
 header('Content-Type: application/json');
@@ -86,15 +89,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
   foreach ($accounts as &$account) {
     if ($account['acco_role'] === 'student') {
-      $student_query = "SELECT * FROM student WHERE acco_id = ?";
-      $student_stmt = mysqli_prepare($DB_T, $student_query);
-      mysqli_stmt_bind_param($student_stmt, 'i', $account['acco_id']);
-      mysqli_stmt_execute($student_stmt);
-      $student_result = mysqli_stmt_get_result($student_stmt);
-      $student_data = mysqli_fetch_assoc($student_result);
-      if ($student_data) {
-        $account = array_merge($account, $student_data);
+      $ch = curl_init($API_URL . "/student/?acco_id=" . $account['acco_id']);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Cookie: jwt=' . $_COOKIE['jwt']
+      ]);
+      $response = curl_exec($ch);
+      $student_data = json_decode($response, true);
+      $students = [];
+      foreach ($student_data['data'] as $student) {
+        $students[] = $student;
       }
+      $account['students'] = $students;
     } else {
       $professor_query = "SELECT * FROM professor WHERE acco_id = ?";
       $professor_stmt = mysqli_prepare($DB_T, $professor_query);
