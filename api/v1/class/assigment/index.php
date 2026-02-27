@@ -20,10 +20,6 @@ if ($UPLOAD_DIR === false) {
   exit;
 }
 
-if (!is_dir($UPLOAD_DIR)) {
-  mkdir($UPLOAD_DIR, 0755, true);
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $id_class  = isset($_GET['id_class']) ? (int) $_GET['id_class'] : null;
 

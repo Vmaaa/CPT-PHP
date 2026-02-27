@@ -30,12 +30,9 @@ $pageStyle = 'pages/class_details.css';
           <!-- COLUMNA IZQUIERDA -->
           <div class="class-left">
             <div id="class-info" class="card"></div>
-
-            <div id="class-professors" class="card"></div>
-
-            <div id="class-students" class="card"></div>
-
             <div id="class-assignments" class="card"></div>
+            <div id="class-students" class="card"></div>
+            <div id="class-professors" class="card"></div>
           </div>
 
           <!-- COLUMNA DERECHA -->

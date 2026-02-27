@@ -21,6 +21,21 @@
   border: 1px solid #eef1f5;
 }
 
+#class-assigments {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+#class-students {
+  max-height: 20vh;
+  overflow-y: auto;
+}
+
+#class-professors {
+  max-height: 15vh;
+  overflow-y: auto;
+}
+
 /* TITULOS */
 .card .name-with-action {
   margin-bottom: 12px;
