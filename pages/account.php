@@ -82,7 +82,12 @@ $pageScript = "account.js";
 
             <!-- ================= STUDENTS ================= -->
             <div id="student-fields" style="display:none;">
-              <h3 style="margin-bottom:15px;">Estudiantes Asociados</h3>
+              <div class="row">
+                <h3>Estudiantes Asociados</h3>
+                <button type="button" class="btn btn-info" id="add-student-btn">
+                  <i class="fas fa-plus"></i> Agregar Estudiante
+                </button>
+              </div>
 
               <div id="students-container"></div>
             </div>
@@ -95,6 +100,7 @@ $pageScript = "account.js";
   </div>
 
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
+  <?php require_once __DIR__ . '/../inc/inc_modals.php'; ?>
   <script src="/assets/js/account.js"></script>
 </body>
 

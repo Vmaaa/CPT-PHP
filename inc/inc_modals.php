@@ -181,7 +181,8 @@
       </button>
     </div>
   </div>
-</div>}
+</div>
+
 <div id="stage-modal-backdrop" class="modal-backdrop" style="display:none;">
   <div class="modal">
 
@@ -247,5 +248,44 @@
       </button>
     </div>
 
+  </div>
+</div>
+
+<div id="student-modal" class="modal-backdrop" style="display:none;">
+  <div class="modal">
+    <div class="modal-header" id="student-modal-header">
+      <h3>Información del alumno</h3>
+      <button class="modal-close" onclick="closeStudentModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form id="student-info-form">
+        <input type="hidden" id="student-acco-id" />
+        <input type="hidden" id="student-id" />
+
+        <div class="form-group">
+          <label for="student-name">Nombre completo</label>
+          <input type="text" id="student-name" class="form-control" required />
+
+          <div class="form-group">
+            <label for="student-school-id">Número de matrícula</label>
+            <input type="text" id="student-school-id" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="student-curp">CURP</label>
+            <input type="text" id="student-curp" class="form-control" required />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeStudentModal()">
+        Cerrar
+      </button>
+      <button type="submit" class="btn btn-primary" form="student-info-form">
+        Guardar
+      </button>
+    </div>
   </div>
 </div>

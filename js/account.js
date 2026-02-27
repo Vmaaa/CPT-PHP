@@ -1,9 +1,14 @@
 const ACCOUNT_API_URL = API_URL + "/account/";
+const STUDENT_API_URL = API_URL + "/student/";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  await refreshAccountData();
+});
+
+async function refreshAccountData() {
   const user = await fetchAccountData();
   if (user) renderAccountDetails(user);
-});
+}
 
 async function fetchAccountData() {
   try {
@@ -41,7 +46,7 @@ function renderAccountDetails(user) {
     document.getElementById("role").value = "Cuenta Estudiante";
     studentFields.style.display = "block";
 
-    renderStudents(user.students || []);
+    renderStudents(user.students || [], user.acco_id);
   }
 
   // ================= PROFESSOR =================
@@ -65,9 +70,13 @@ function renderAccountDetails(user) {
   }
 }
 
-function renderStudents(students) {
+function renderStudents(students, acco_id) {
 
   const container = document.getElementById("students-container");
+  const addStudentButton = document.getElementById("add-student-btn");
+
+  addStudentButton.addEventListener("click", () => openStudentModal(null, acco_id));
+
   container.innerHTML = "";
 
   if (!students.length) {
@@ -84,10 +93,17 @@ function renderStudents(students) {
     wrapper.style.borderRadius = "6px";
 
     wrapper.innerHTML = `
-      <h4 style="margin-bottom:15px;">
-        Estudiante ${index + 1}
-      </h4>
-
+      <div class="row">
+        <h4>
+          Estudiante ${index + 1}
+        </h4>
+        <button class="btn btn-info">
+          <i class="fas fa-pencil"></i> Editar
+        </button>
+        <button class="btn btn-error" style="margin-left: 10px;">
+          <i class="fas fa-trash"></i> Eliminar
+        </button>
+      </div>
       <div class="form-group">
         <label>Nombre</label>
         <input type="text" class="form-control"
@@ -98,6 +114,12 @@ function renderStudents(students) {
         <label>Matrícula</label>
         <input type="text" class="form-control"
                value="${student.school_id_number || ''}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>CURP</label>
+        <input type="text" class="form-control"
+               value="${student.curp || ''}" readonly>
       </div>
 
       <div class="form-group">
@@ -114,6 +136,141 @@ function renderStudents(students) {
     `;
 
     container.appendChild(wrapper);
+
+    //add event listener to edit button
+    const editButton = wrapper.querySelector(".btn-info");
+    //prevent default behavior of button
+    editButton.addEventListener("click", (e) => e.preventDefault());
+    editButton.addEventListener("click", () => openStudentModal(student, acco_id));
+
+    const deleteButton = wrapper.querySelector(".btn-error");
+    deleteButton.addEventListener("click", (e) => e.preventDefault());
+    deleteButton.addEventListener("click", () => deleteStudent(student.id_student));
+  });
+}
+
+function openStudentModal(student, acco_id) {
+  const form = document.getElementById("student-info-form");
+  form.reset();
+  document.getElementById("student-acco-id").value = acco_id;
+  if (student) {
+  document.getElementById("student-id").value = student.id_student || "";
+  document.getElementById("student-name").value = student.name || "";
+  document.getElementById("student-school-id").value = student.school_id_number || "";
+  document.getElementById("student-curp").value = student.curp || "";
+  }
+  openModal("student-modal");
+}
+
+function closeStudentModal() {
+  closeModal("student-modal");
+}
+
+//event listener for form submission
+document.getElementById("student-info-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  const studentId = document.getElementById("student-id").value;
+  const accoId = document.getElementById("student-acco-id").value;
+  const name = document.getElementById("student-name").value;
+  const schoolId = document.getElementById("student-school-id").value;
+  const curp = document.getElementById("student-curp").value;
+
+
+  if(!name || !schoolId || !curp ) {
+    SwalMessage({
+      title: "Error",
+      text: "Por favor completa todos los campos.",
+      icon: "error",
+    })
+    return;
+  }
+
+  const method = studentId ? "PUT" : "POST";
+  const formData = new FormData();
+  formData.append("acco_id", accoId);
+  formData.append("name", name);
+  formData.append("school_id_number", schoolId);
+  formData.append("curp", curp);
+  if (studentId) formData.append("id_student", studentId);
+  
+  try {
+  const response = await CookieManager.fetchWithAuth(`${STUDENT_API_URL}`, {
+      method,
+      body: formData,
+      });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      SwalMessage({
+        title: "Error",
+        text: errorData.error || "Ocurrió un error al guardar el estudiante.",
+        icon: "error",
+      });
+      return;
+    }
+    
+    await refreshAccountData();
+    closeStudentModal();
+    SwalMessage({
+      title: "Éxito",
+      text: `Estudiante ${studentId ? "actualizado" : "creado"} correctamente.`,
+      icon: "success",
+    });
+  }
+  catch (error) {
+    SwalMessage({
+      title: "Error",
+      text: "Ocurrió un error al guardar el estudiante.",
+      icon: "error",
+    });
+  }
+}
+);
+
+async function deleteStudent(studentId) {
+ const confirmResult = await SwalConfirm({
+    title: "¿Eliminar estudiante?",
+    text: "Esta acción no se puede deshacer.",
+    icon: "warning",
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+  });
+  
+  if (!confirmResult) return;
+   
+  const formData = new FormData();
+  formData.append("id_student", studentId);
+  try {
+    const response = await CookieManager.fetchWithAuth(`${STUDENT_API_URL}`, {
+      method: "DELETE",
+      body: formData,
+    });
+  
+    if (!response.ok) {
+      const errorData = await response.json();
+      SwalMessage({
+        title: "Error",
+        text: errorData.error || "Ocurrió un error al eliminar el estudiante.",
+        icon: "error",
+      });
+      return;
+    }
+  }
+  catch (error) {
+    SwalMessage({
+      title: "Error",
+      text: "Ocurrió un error al eliminar el estudiante.",
+      icon: "error",
+    });
+    return;
+  }
+
+  await refreshAccountData();
+  SwalMessage({
+    title: "Éxito",
+    text: "Estudiante eliminado correctamente.",
+    icon: "success",
   });
 }
 
