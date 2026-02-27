@@ -21,17 +21,20 @@ try {
             fp.id_final_project,
             fp.title,
             fp.status,
-            s.name AS student_name,
+            
+            (SELECT GROUP_CONCAT(s.name SEPARATOR ', ') 
+             FROM student s 
+             WHERE s.acco_id = fps.acco_id
+            ) AS student_name,
+            
             c.career,
             fc.file_url,
             fc.stage
         FROM fp_advisor fa
         JOIN final_project fp ON fp.id_final_project = fa.id_final_project
         JOIN fp_student fps ON fps.id_final_project = fp.id_final_project
-        JOIN student s ON s.id_student = fps.id_student
         JOIN career c ON c.id_career = fp.id_career
         
-        /* JOIN para obtener el último PDF */
         JOIN fp_change fc ON fc.id_final_project = fp.id_final_project
         INNER JOIN (
             SELECT id_final_project, MAX(stage) as max_stage
@@ -41,7 +44,8 @@ try {
                 AND latest.max_stage = fc.stage
         
         WHERE fa.id_professor = ?
-        ORDER BY fp.status ASC, s.name ASC
+        -- CAMBIO: Ordenamos usando el alias student_name en lugar de s.name
+        ORDER BY fp.status ASC, student_name ASC
     ";
 
   $stmt = $DB->prepare($sql);

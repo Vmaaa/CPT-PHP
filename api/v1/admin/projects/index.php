@@ -10,14 +10,19 @@ $SS = ServerSpecifics::getInstance();
 $DB = $SS->fnt_getDBConnection();
 
 try {
+
   $sql = "
     SELECT 
       fp.id_final_project,
       fp.title,
       fp.abstract,
       fp.status,
-      s.name AS student_name,
       c.career,
+
+      (SELECT GROUP_CONCAT(s.name SEPARATOR ', ') 
+       FROM student s 
+       WHERE s.acco_id = fps.acco_id
+      ) AS student_name,
 
       (SELECT file_url 
        FROM fp_change 
@@ -39,7 +44,6 @@ try {
 
     FROM final_project fp
     JOIN fp_student fps ON fps.id_final_project = fp.id_final_project
-    JOIN student s ON s.id_student = fps.id_student
     JOIN career c ON c.id_career = fp.id_career
     ORDER BY fp.id_final_project DESC
   ";

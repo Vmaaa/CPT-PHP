@@ -35,8 +35,12 @@ async function loadAdvised() {
 
       card.innerHTML = `
                 <div class="card-header">
-                    <h3>${escapeHtml(p.student_name)}</h3>
-                    <span class="status-badge ${st.class}">${st.text}</span>
+                  <div>
+                    <small style="color: #64748b; font-size: 0.8rem; text-transform: uppercase; font-weight: bold;">Equipo</small>
+                    <h3 style="margin-top: 2px;">${escapeHtml(p.student_name)}</h3>
+                  </div>
+                  <span class="status-badge ${st.class}">${st.text}</span>
+
                 </div>
                 
                 <div class="card-body">

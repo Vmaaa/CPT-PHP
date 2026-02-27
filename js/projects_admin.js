@@ -70,7 +70,7 @@ function renderAdminProjects(projects) {
       <p class="project-abstract">${escapeHtml(p.abstract)}</p>
 
       <div class="project-meta">
-        <span><strong>Alumno:</strong> ${escapeHtml(p.student_name)}</span>
+        <span><strong>Equipo:</strong> ${escapeHtml(p.student_name)}</span>
         <span><strong>Carrera:</strong> ${escapeHtml(p.career)}</span>
       </div>
 

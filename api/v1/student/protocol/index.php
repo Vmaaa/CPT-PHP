@@ -12,13 +12,8 @@ $DB = $SS->fnt_getDBConnection();
 try {
   $DB->begin_transaction();
 
-  $stmt = $DB->prepare("SELECT id_student FROM student WHERE acco_id = ? LIMIT 1");
-  $stmt->bind_param("i", $AUTH['acco_id']);
-  $stmt->execute();
-  $student = $stmt->get_result()->fetch_assoc();
-
-  if (!$student) throw new Exception("Alumno no encontrado");
-  $idStudent = (int)$student['id_student'];
+  // Ya no necesitamos buscar el id_student. Usamos directamente el acco_id del token.
+  $accountId = (int)$AUTH['acco_id'];
 
   if (!isset($_FILES['protocol_file']) || $_FILES['protocol_file']['error'] !== UPLOAD_ERR_OK) {
     throw new Exception("Error al subir el archivo");
@@ -39,8 +34,9 @@ try {
 
   if (!is_dir($baseUploadDir)) mkdir($baseUploadDir, 0777, true);
 
-  $studentDir = $baseUploadDir . "/" . $idStudent;
-  $studentWebUrl = $webBasePath . "/" . $idStudent;
+  // Cambiamos la carpeta para que se base en la cuenta, no en un solo alumno
+  $studentDir = $baseUploadDir . "/acco_" . $accountId;
+  $studentWebUrl = $webBasePath . "/acco_" . $accountId;
 
   if (!is_dir($studentDir)) mkdir($studentDir, 0777, true);
 
@@ -52,9 +48,10 @@ try {
     throw new Exception("No se pudo guardar el archivo en el servidor");
   }
 
-  $checkSql = "SELECT id_final_project FROM fp_student WHERE id_student = ?";
+  // Verificamos si la CUENTA ya tiene un proyecto asociado
+  $checkSql = "SELECT id_final_project FROM fp_student WHERE acco_id = ?";
   $stmtCheck = $DB->prepare($checkSql);
-  $stmtCheck->bind_param("i", $idStudent);
+  $stmtCheck->bind_param("i", $accountId);
   $stmtCheck->execute();
   $existingRes = $stmtCheck->get_result()->fetch_assoc();
 
@@ -83,10 +80,8 @@ try {
 
     $idNewChange = $DB->insert_id;
 
-    // 1. Buscamos cuál fue el cambio anterior (stage - 1)
     $prevStage = $nextStage - 1;
 
-    // 2. Buscamos qué profesores revisaron esa versión anterior
     $sqlOldReviewers = "
             SELECT DISTINCT id_professor 
             FROM fp_change_review fcr
@@ -116,8 +111,9 @@ try {
     $stmt->execute();
     $idProject = (int)$DB->insert_id;
 
-    $stmt = $DB->prepare("INSERT INTO fp_student (id_student, id_final_project) VALUES (?, ?)");
-    $stmt->bind_param("ii", $idStudent, $idProject);
+    // Insertamos la relación usando acco_id en lugar de id_student
+    $stmt = $DB->prepare("INSERT INTO fp_student (acco_id, id_final_project) VALUES (?, ?)");
+    $stmt->bind_param("ii", $accountId, $idProject);
     $stmt->execute();
 
     $stmt = $DB->prepare("INSERT INTO fp_change (id_final_project, stage, file_url) VALUES (?, 1, ?)");

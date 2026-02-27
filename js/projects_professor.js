@@ -66,11 +66,13 @@ async function loadProfessorProjects() {
 
           <div class="card-body">
              <div class="student-row">
+              
                 <div>
+                   <small style="color: #64748b; font-weight: 600;">Equipo:</small><br>
                    <strong>${escapeHtml(p.student_name)}</strong>
-                   <br><small>${escapeHtml(p.career)}</small>
+                   <br><small style="color: #64748b;">${escapeHtml(p.career)}</small>
                 </div>
-                
+
                 <button type="button" class="btn-view-pdf-icon" onclick="window.openPdfModal('${p.id_final_project}')">
                     <i class="fas fa-eye"></i> Ver PDF
                 </button>

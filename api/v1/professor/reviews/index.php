@@ -9,6 +9,7 @@ require_once dirname(__DIR__, 4) . "/functions/serverSpecifics.php";
 $DB = ServerSpecifics::getInstance()->fnt_getDBConnection();
 
 try {
+
   $sql = "
     SELECT
       fp.id_final_project,
@@ -16,13 +17,18 @@ try {
       fp.abstract,
       fp.status,
       c.career AS career,
-      s.name AS student_name,
+      
+      (SELECT GROUP_CONCAT(s.name SEPARATOR ', ') 
+       FROM student s 
+       WHERE s.acco_id = fs.acco_id
+      ) AS student_name,
+      
       fcr.id_fp_change_review,
       fc.file_url,        
       fcr.grade,
       fcr.comment,
       fcr.reviewer_pdf_url,
-      fc.stage           
+      fc.stage            
     FROM fp_change_review fcr
     JOIN professor p ON p.id_professor = fcr.id_professor
     JOIN fp_change fc ON fc.id_fp_change = fcr.id_fp_change
@@ -36,7 +42,6 @@ try {
             AND latest.max_stage = fc.stage
 
     JOIN fp_student fs ON fs.id_final_project = fp.id_final_project
-    JOIN student s ON s.id_student = fs.id_student
     JOIN career c ON c.id_career = fp.id_career
     
     WHERE p.acco_id = ?
