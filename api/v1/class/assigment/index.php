@@ -45,9 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $data = [];
 
   while ($row = mysqli_fetch_assoc($result)) {
+    $row['can_be_edited'] = false;
+    $row['submissions'] = [];
     if ($AUTH['acco_role'] !== 'student') {
       $row['can_be_edited'] = $row['id_professor'] == $AUTH['id_professor'];
     }
+    //retrieve submissions
+    $ch = curl_init($API_URL . "/class/assigment_submission/?id_assignment=" . $row['id_assigment']);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
+    ]);
+    $response = curl_exec($ch);
+    $submissions = json_decode($response, true)['data'] ?? [];
+    $row['submissions'] = $submissions;
     $data[] = $row;
   }
 

@@ -8,7 +8,7 @@ $projectModuleProfessor   = ['PROYECTO_P'  => ['url' => 'pages/projects_professo
 $projectModuleStudent = ['PROYECTO_S'  => ['url' => 'pages/projects_student.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyecto']];
 $classModuleAdmin        = ['CLASES_A'     => ['url' => 'pages/classes_admin.php',   'icon' => 'fas fa-school', 'label' => 'Clases']];
 $classModuleProfessor     = ['CLASES_P'     => ['url' => 'pages/classes.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
-$classModuleStudent       = ['CLASES_S'     => ['url' => 'pages/classes_student.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clases']];
+$classModuleStudent       = ['CLASES_S'     => ['url' => 'pages/classes_student.php',   'icon' => 'fas fa-chalkboard-teacher', 'label' => 'Clase']];
 $projectModuleAdmin      = ['PROYECTOS_ADMIN' => ['url' => 'pages/projects_admin.php',  'icon' => 'fas fa-folder-open',    'label' => 'Proyectos']];
 $calendaryModuleAdmin   = ['CALENDARIO_A' => ['url' => 'pages/calendary_admin.php',  'icon' => 'fas fa-calendar-alt',   'label' => 'Calendario']];
 

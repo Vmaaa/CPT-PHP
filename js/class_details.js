@@ -217,24 +217,33 @@ function renderAssignmentDetail(assignment) {
 
       <!-- COLUMNA IZQUIERDA -->
       <div class="assignment-info">
-        <p>${assignment.description || "Sin descripción"}</p>
+        <h3><strong>Datos de la actividad</strong></h3>
+        <p><strong>Descripción:</strong> ${assignment.description || "Sin descripción"}</p>
 
         <p><strong>Fecha de entrega:</strong> ${assignment.due_date}</p>
 
         <h4>Entregados</h4>
         <ul class="delivered-list">
           ${
-    assignment.deliveries?.length
-      ? assignment.deliveries
-        .map((d) => `<li>${d.student_name}</li>`)
-        .join("")
-      : "<li>Nadie ha entregado aún</li>"
-  }
+            assignment.submissions?.length
+              ? assignment.submissions
+                .map((s) => {
+                  const firstStudent = s.students[0];
+                  const firstName = firstStudent.name
+                    ? `${firstStudent.name} (${firstStudent.school_id_number})`
+                    : firstStudent.school_id_number;
+                  const extraCount = s.students.length > 1 ? ` y ${s.students.length - 1} más` : "";
+                  return `<li>Cuenta: ${s.acco_id} <br> ${firstName}${extraCount}</li>`;
+                })
+                .join("")
+              : "<li>Nadie ha entregado aún</li>"
+          }
         </ul>
       </div>
 
       <!-- COLUMNA DERECHA -->
       <div class="assignment-preview">
+        <h3><strong>Documento de la asignación</strong></h3>
         ${
     assignment.file_url
       ? `<iframe src="${assignment.file_url}" loading="lazy"></iframe>`

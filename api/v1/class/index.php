@@ -13,7 +13,7 @@ require_once __DIR__ . "/../../../config/cors.php";
 require_once __DIR__ . "/../../../utils/token/pre_validate.php";
 require_once __DIR__ . "/../../../utils/input/input_parser.php";
 
-if (!in_array($AUTH['acco_role'], ['admin', 'professor'])) {
+if (!in_array($AUTH['acco_role'], ['admin', 'professor']) && $_SERVER['REQUEST_METHOD'] !== 'GET') {
   http_response_code(403);
   echo json_encode(['error' => 'Acceso denegado']);
   exit;
@@ -40,13 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $types .= 'i';
   }
 
-  if ($from_admin_panel === 0 || $AUTH['acco_role'] === 'professor') {
+  if (($from_admin_panel === 0 || $AUTH['acco_role'] === 'professor') && $AUTH['acco_role'] !== 'student') {
     $conds[] = "id_class IN (
       SELECT cp.id_class
       FROM class_professor cp
       WHERE cp.id_professor = ?
     )";
     $params[] = $AUTH['id_professor'];
+    $types .= 'i';
+  }
+
+  if ($AUTH['acco_role'] === 'student') {
+    $conds[] = "id_class IN (
+      SELECT s.id_class
+      FROM student s
+      WHERE s.acco_id = ?
+    )";
+    $params[] = $AUTH['acco_id'];
     $types .= 'i';
   }
 
@@ -67,34 +77,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $classes = [];
 
   while ($row = mysqli_fetch_assoc($result)) {
-    $row['professors'] = [];
-    $row['students'] = [];
+    if ($AUTH['acco_role'] !== 'student') {
+      $row['professors'] = [];
+      $row['students'] = [];
+    }
     $row['assigments'] = [];
     $classes[$row['id_class']] = $row;
   }
 
   foreach ($classes as $id_class => &$class) {
-    //petición a la api de professors
-    $ch = curl_init($API_URL . "/class/professor/?id_class=" . $id_class);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-      'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
-    ]);
-    $response = curl_exec($ch);
-    $professors_data = json_decode($response, true);
-    foreach ($professors_data['data'] as $prof) {
-      $class['professors'][] = $prof;
-    }
-    //peticion a la api de students
-    $ch = curl_init($API_URL . "/class/student/?id_class=" . $id_class);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-      'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
-    ]);
-    $response = curl_exec($ch);
-    $students_data = json_decode($response, true);
-    foreach ($students_data['data'] as $stud) {
-      $class['students'][] = $stud;
+    if ($AUTH['acco_role'] !== 'student') {
+      //petición a la api de professors
+      $ch = curl_init($API_URL . "/class/professor/?id_class=" . $id_class);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
+      ]);
+      $response = curl_exec($ch);
+      $professors_data = json_decode($response, true);
+      foreach ($professors_data['data'] as $prof) {
+        $class['professors'][] = $prof;
+      }
+      //peticion a la api de students
+      $ch = curl_init($API_URL . "/class/student/?id_class=" . $id_class);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Cookie: jwt=' . ($_COOKIE['jwt'] ?? '')
+      ]);
+      $response = curl_exec($ch);
+      $students_data = json_decode($response, true);
+      foreach ($students_data['data'] as $stud) {
+        $class['students'][] = $stud;
+      }
     }
     //petición a la api de assigments
     $ch = curl_init($API_URL . "/class/assigment/?id_class=" . $id_class);
