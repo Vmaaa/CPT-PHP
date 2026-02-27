@@ -153,10 +153,13 @@
       <p> El total de alumnos seleccionados será el nuevo conjunto de alumnos de la clase </p>
 
       <small class"text-muted" style="display: block;"> Presiona Ctrl (o Cmd en Mac) para seleccionar múltiples alumnos </small>
+      <small class"text-muted" style="display: block;"> Para ver toda la lista de estudiantes en la cuenta, mantén el cursor sobre el nombre del estudiante </small>
       <label>Alumnos actuales</label>
       <select
         id="current-students"
         multiple
+        size="10"
+        style="white-space: pre;"
         class="form-select-multiple">
       </select>
 
@@ -164,6 +167,8 @@
       <select
         id="available-students"
         multiple
+        size="10"
+        style="white-space: pre;"
         class="form-select-multiple">
       </select>
 

@@ -48,9 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
   $_PUT = fnt_parseInputMultiPart();
   $id_class = isset($_PUT['id_class']) ? intval($_PUT['id_class']) : null;
-  $students_ids = isset($_PUT['students_ids']) ? $_PUT['students_ids'] : null;
+  $account_ids = isset($_PUT['account_ids']) ? $_PUT['account_ids'] : null;
 
-  $required_params = ['id_class', 'students_ids'];
+  $required_params = ['id_class', 'account_ids'];
   $missing_params = [];
   foreach ($required_params as $param) {
     if (is_null($$param)) {
@@ -63,11 +63,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     exit;
   }
   //validate that students_ids is an array
-  if (!is_array($students_ids)) {
+  if (!is_array($account_ids)) {
     http_response_code(400);
-    echo json_encode(['error' => 'students_ids debe ser un arreglo']);
+    echo json_encode(['error' => 'account_ids debe ser un array']);
     exit;
   }
+  //retrieve students from each account id
+  $students_ids = [];
+  foreach ($account_ids as $account_id) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $API_URL . "/student/?acco_id=" . $account_id);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Cookie: jwt=' . $_COOKIE['jwt']
+    ]);
+    $response = curl_exec($ch);
+    $students = json_decode($response, true)['data'];
+    foreach ($students as $student) {
+      $students_ids[] = $student['id_student'];
+    }
+  }
+
   //retrieve current students in class
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $API_URL . "/class/student/?id_class=" . $id_class);

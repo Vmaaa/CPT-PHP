@@ -138,7 +138,7 @@ async function createClassCard(cls) {
     ? cls.students.slice(0, maxDisplayStudents).map((s) => `
         <li>
           <span class="name">${s.name}</span>
-          <span class="name-subtitle">${s.school_id_number}</span>
+          <span class="name-subtitle">(Cuenta: ${s.acco_id}) - ${s.school_id_number}</span>
         </li>
       `).join("") + (cls.students.length > maxDisplayStudents
       ? `<li class="more-info">y ${

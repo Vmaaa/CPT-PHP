@@ -78,7 +78,7 @@ function renderProfessors(professors = []) {
   }
 
   container.innerHTML = `
-    <h3>Profesores</h3>
+    <h3>Profesores (${professors.length})</h3> 
     <ul>
       ${
     professors
@@ -100,7 +100,7 @@ function renderStudents(students = [], classId, careerId) {
 
   const header = `
     <div class="name-with-action">
-      <h3>Alumnos</h3>
+      <h3>Alumnos (${students.length})</h3>
       <button class="btn btn-primary" onclick="openEditClassStudentsModal(${classId}, ${careerId})">
         <i class="fas fa-edit"></i> Editar Alumnos
       </button>
@@ -115,8 +115,25 @@ function renderStudents(students = [], classId, careerId) {
     return;
   }
 
-  const studentsList = students
-    .map((s) => `<li>${s.name} – ${s.school_id_number}</li>`)
+  //group students by acco_id
+  const studentsByAccount = groupStudentsByAccount(students);
+
+  //alternate bold for each account group
+  const studentsList = Object.values(studentsByAccount)
+    .map((group) => {
+      let groupHTML = "<h4>Cuenta: " + group[0].acco_id + "</h4>";
+      groupHTML += group
+        .map(
+          (s) => `
+            <li>
+              <span class="name">${s.name}</span>
+              <span class="name-subtitle">${s.school_id_number}</span>
+            </li>
+          `,
+        )
+        .join("");
+      return groupHTML
+    })
     .join("");
 
   container.innerHTML = `
@@ -459,12 +476,38 @@ async function openEditClassStudentsModal(classId, careerId) {
   const currentSelect = document.getElementById("current-students");
   currentSelect.innerHTML = "";
   const classStudents = await fetchClassStudents(classId);
-  classStudents.forEach((student) => {
+  // group students by acco_id
+  const classStudentsGrouped = groupStudentsByAccount(classStudents);
+
+  //handle option groups by acco_id, each group will be and option group with the acco_id as label, and the students as options
+  Object.entries(classStudentsGrouped).forEach(([accoId, students]) => {
+
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = `Cuenta ${accoId}`;
+
     const option = document.createElement("option");
-    option.value = student.id_student;
-    option.textContent = `${student.name} – ${student.school_id_number}`;
-    option.selected = true;
-    currentSelect.appendChild(option);
+    option.value = accoId;
+
+    const firstStudent = students[0];
+    const extraCount = students.length - 1;
+
+    if (extraCount > 0) {
+      option.textContent =
+        `(${firstStudent.school_id_number}) ${firstStudent.name} y ${extraCount} más...`;
+    } else {
+      option.textContent = `(${firstStudent.school_id_number}) ${firstStudent.name}`;
+    }
+
+    // Tooltip completo
+    option.title = students
+      .map(s => `(${s.school_id_number}) ${s.name}`)
+      .join("\n");
+
+    option.selected = true; // Marcar como seleccionado por ser estudiante actual de la clase
+
+    optgroup.appendChild(option);
+    currentSelect.appendChild(optgroup);
+
   });
 
   //load avaliable students into the select
@@ -474,12 +517,34 @@ async function openEditClassStudentsModal(classId, careerId) {
     id_career: careerId,
     "without_class": "1",
   });
-  avaliableStudents.forEach((student) => {
+  const avaliableStudentsGrouped = groupStudentsByAccount(avaliableStudents);
+  Object.entries(avaliableStudentsGrouped).forEach(([accoId, students]) => {
+  
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = `Cuenta ${accoId}`;
+
     const option = document.createElement("option");
-    option.value = student.id_student;
-    option.textContent = `${student.name} – ${student.school_id_number}`;
-    option.selected = false;
-    select.appendChild(option);
+    option.value = accoId;
+
+    const firstStudent = students[0];
+    const extraCount = students.length - 1;
+
+    if (extraCount > 0) {
+      option.textContent =
+        `(${firstStudent.school_id_number}) ${firstStudent.name} y ${extraCount} más...`;
+  
+    } else {
+      option.textContent = `(${firstStudent.school_id_number}) ${firstStudent.name}`;
+    }
+
+    // Tooltip completo
+    option.title = students
+      .map(s => `(${s.school_id_number}) ${s.name}`)
+      .join("\n");
+
+    optgroup.appendChild(option);
+    select.appendChild(optgroup);
+
   });
 
   window.openModal("modal-edit-students");
@@ -501,13 +566,12 @@ async function saveClassStudents() {
     .concat(Array.from(availableSelect.options))
     .filter((option) => option.selected)
     .map((option) => ({
-      id_student: option.value,
-      name: option.textContent,
+      name: option.value
     }));
 
   const confirmed = await SwalConfirm({
     title: "Confirmar cambios",
-    text: "Los alumnos seleccionados son los siguientes: " +
+    text: "Las siguientes cuentas de estudiantes serán asignadas a la clase: " +
       selectedStudentInformation
         .map((s) => s.name)
         .join(", "),
@@ -523,7 +587,7 @@ async function saveClassStudents() {
   const formData = new FormData();
   formData.append("id_class", classId);
   selectedStudentIds.forEach((id) => {
-    formData.append("students_ids[]", id);
+    formData.append("account_ids[]", id);
   });
 
   const response = await CookieManager.fetchWithAuth(

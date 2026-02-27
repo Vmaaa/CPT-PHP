@@ -7,3 +7,13 @@ function formatDateForDatabase(d) {
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
+function groupStudentsByAccount(students) {
+  return students.reduce((acc, student) => {
+    if (!acc[student.acco_id]) {
+      acc[student.acco_id] = [];
+    }
+    acc[student.acco_id].push(student);
+    return acc;
+  }
+  , {});
+}
