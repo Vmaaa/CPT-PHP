@@ -57,10 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   $query = "SELECT asu.*, ac.acco_id FROM assigment_submission asu
+      INNER JOIN account ac ON asu.acco_id = ac.acco_id
       INNER JOIN assigment a ON asu.id_assigment = a.id_assigment
-      INNER JOIN class c ON a.id_class = c.id_class
-      INNER JOIN student st ON asu.id_student = st.id_student
-      INNER JOIN account ac ON st.acco_id = ac.acco_id
       WHERE " . implode(' AND ', $conds);
 
 
