@@ -24,7 +24,28 @@ $MAIN_DB = $SS->fnt_getDBConnection();
 try {
   $accountId = (int)$AUTH['acco_id'];
 
-  // 1. Proyecto de la cuenta (buscamos por acco_id)
+  // 1. Obtener los datos base del estudiante asociado a la cuenta
+  $sqlStudentInfo = "
+      SELECT id_career, first_half, year 
+      FROM student 
+      WHERE acco_id = ? 
+      LIMIT 1
+  ";
+  $stmtStudent = $MAIN_DB->prepare($sqlStudentInfo);
+  $stmtStudent->bind_param("i", $accountId);
+  $stmtStudent->execute();
+  $studentInfo = $stmtStudent->get_result()->fetch_assoc();
+
+  if (!$studentInfo) {
+    echo json_encode([
+      'hasProject' => false,
+      'isUploadStageActive' => false,
+      'needsConfiguration' => true
+    ]);
+    exit;
+  }
+
+  // 2. Proyecto de la cuenta
   $sql = "
     SELECT 
       fp.id_final_project,
@@ -42,16 +63,87 @@ try {
   $stmt->execute();
   $project = $stmt->get_result()->fetch_assoc();
 
+  // 3. Verificar primera subida (Si NO tiene proyecto)
   if (!$project) {
+    $sqlCalendar = "
+          SELECT start_date, end_date
+          FROM calendar_events
+          WHERE stage = 'upload_protocols'
+            AND id_career = ?
+            AND year = ?
+            AND first_half = ?
+            AND NOW() BETWEEN start_date AND end_date
+          LIMIT 1
+      ";
+    $stmtCalendar = $MAIN_DB->prepare($sqlCalendar);
+    $stmtCalendar->bind_param("iii", $studentInfo['id_career'], $studentInfo['year'], $studentInfo['first_half']);
+    $stmtCalendar->execute();
+    $calendarResult = $stmtCalendar->get_result()->fetch_assoc();
+
     echo json_encode([
-      'hasProject' => false
+      'hasProject' => false,
+      'isUploadStageActive' => $calendarResult ? true : false,
+      'calendarEvent' => $calendarResult ?: null
     ]);
     exit;
   }
 
   $idFinalProject = (int)$project['id_final_project'];
 
-  // 2. Último cambio
+  // --- NUEVO: 3.5 Verificar segunda subida (Si SÍ tiene proyecto y fue RECHAZADO) ---
+  $isSecondUploadStageActive = false;
+  $secondCalendarEvent = null;
+
+  if ($project['status'] === 'REJECTED') {
+    $sqlSecondCalendar = "
+          SELECT start_date, end_date
+          FROM calendar_events
+          WHERE stage = 'second_upload_protocols'
+            AND id_career = ?
+            AND year = ?
+            AND first_half = ?
+            AND NOW() BETWEEN start_date AND end_date
+          LIMIT 1
+      ";
+    $stmtSecondCal = $MAIN_DB->prepare($sqlSecondCalendar);
+    $stmtSecondCal->bind_param("iii", $studentInfo['id_career'], $studentInfo['year'], $studentInfo['first_half']);
+    $stmtSecondCal->execute();
+    $secondCalResult = $stmtSecondCal->get_result()->fetch_assoc();
+
+    if ($secondCalResult) {
+      $isSecondUploadStageActive = true;
+      $secondCalendarEvent = $secondCalResult;
+    }
+  }
+
+  // --- NUEVO: 3.6 Verificar subida de documento final (Si SÍ tiene proyecto y fue APROBADO) ---
+  $isFinalUploadStageActive = false;
+  $finalCalendarEvent = null;
+
+  if ($project['status'] === 'APPROVED') {
+    $sqlFinalCalendar = "
+          SELECT start_date, end_date
+          FROM calendar_events
+          WHERE stage = 'upload_final_documents'
+            AND id_career = ?
+            AND year = ?
+            AND first_half = ?
+            AND NOW() BETWEEN start_date AND end_date
+          LIMIT 1
+      ";
+    $stmtFinalCal = $MAIN_DB->prepare($sqlFinalCalendar);
+    $stmtFinalCal->bind_param("iii", $studentInfo['id_career'], $studentInfo['year'], $studentInfo['first_half']);
+    $stmtFinalCal->execute();
+    $finalCalResult = $stmtFinalCal->get_result()->fetch_assoc();
+
+    if ($finalCalResult) {
+      $isFinalUploadStageActive = true;
+      $finalCalendarEvent = $finalCalResult;
+    }
+  }
+
+
+  // 4. Último cambio
   $sql = "
     SELECT id_fp_change, stage, file_url, created_at
     FROM fp_change
@@ -64,7 +156,7 @@ try {
   $stmt->execute();
   $change = $stmt->get_result()->fetch_assoc();
 
-  // 3. Revisiones
+  // 5. Revisiones
   $reviews = [];
   $completedReviews = 0;
 
@@ -99,7 +191,11 @@ try {
     'project' => $project,
     'change' => $change,
     'reviews' => $reviews,
-    'completedReviews' => $completedReviews
+    'completedReviews' => $completedReviews,
+    'isSecondUploadStageActive' => $isSecondUploadStageActive,
+    'secondCalendarEvent' => $secondCalendarEvent,
+    'isFinalUploadStageActive' => $isFinalUploadStageActive,
+    'finalCalendarEvent' => $finalCalendarEvent
   ]);
 } catch (Exception $e) {
   http_response_code(500);

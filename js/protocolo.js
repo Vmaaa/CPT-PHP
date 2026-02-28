@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadProtocolStatus() {
   const container = document.getElementById("protocol-container");
-  container.innerHTML =
-    `<div class="loading"><p>Cargando proyecto...</p></div>`;
+  container.innerHTML = `<div class="loading"><p>Cargando información...</p></div>`;
 
   try {
     const response = await CookieManager.fetchWithAuth(PROTOCOL_API_URL);
@@ -17,15 +16,26 @@ async function loadProtocolStatus() {
     const result = await response.json();
 
     if (!result.hasProject) {
-      renderNoProject(container);
-      return;
+        if (result.needsConfiguration) {
+            container.innerHTML = `
+              <div style="text-align:center; padding:50px;">
+                <h3>Configura tu perfil</h3>
+                <p style="color:#666;">Debes agregar al menos un estudiante a tu cuenta en el apartado "Mi Cuenta" antes de subir un protocolo.</p>
+              </div>`;
+            return;
+        }
+        if (result.isUploadStageActive) {
+            renderNoProject(container);
+        } else {
+            renderUploadStageClosed(container);
+        }
+        return;
     }
 
     renderProjectStatus(container, result);
   } catch (error) {
     console.error(error);
-    container.innerHTML =
-      `<p class="error-text">No se pudo cargar la información.</p>`;
+    container.innerHTML = `<p class="error-text">No se pudo cargar la información.</p>`;
   }
 }
 
@@ -41,8 +51,21 @@ function renderNoProject(container) {
   `;
 }
 
+function renderUploadStageClosed(container) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:50px;">
+        <i class="fas fa-calendar-times" style="color: #64748b; font-size: 3em; margin-bottom: 20px;"></i>
+        <h3 style="color: #334155;">Periodo Cerrado</h3>
+        <p style="color:#64748b; max-width: 400px; margin: 10px auto;">
+          Actualmente no hay un periodo de registro de protocolos abierto para tu carrera y generación. 
+          Por favor, mantente atento a los avisos de la coordinación o consulta el calendario académico.
+        </p>
+      </div>
+    `;
+}
+
 function renderProjectStatus(container, data) {
-  const { project, reviews, completedReviews } = data;
+  const { project, reviews, completedReviews, isSecondUploadStageActive, isFinalUploadStageActive } = data;
 
   const statusMap = {
     "PENDING": { text: "Pendiente de Asignación", class: "status-pending" },
@@ -56,31 +79,68 @@ function renderProjectStatus(container, data) {
       class: "status-rejected",
     },
   };
-  const st = statusMap[project.status] ||
-    { text: project.status, class: "status-pending" };
+  const st = statusMap[project.status] || { text: project.status, class: "status-pending" };
 
   let mainAlertHtml = "";
 
   if (project.status === "REJECTED") {
+    // --- NUEVO: Lógica para mostrar u ocultar el botón de segunda subida ---
+    let reuploadActionHtml = "";
+    
+    if (isSecondUploadStageActive) {
+        reuploadActionHtml = `
+            <a href="/CPT/pages/protocolo_form.php" class="btn-reupload">
+                <i class="fas fa-upload"></i> Subir Protocolo Corregido
+            </a>
+        `;
+    } else {
+        reuploadActionHtml = `
+            <div style="margin-top: 15px; padding: 12px; background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; color: #991b1b; font-size: 0.9em;">
+                <i class="fas fa-calendar-times"></i> <strong>Periodo Cerrado:</strong> El sistema actualmente no está recibiendo correcciones de protocolos. Espera a que se habilite la etapa de "Segunda subida".
+            </div>
+        `;
+    }
+
     mainAlertHtml = `
         <div class="rejected-alert">
             <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
             <div class="alert-content">
                 <h4>Tu protocolo no fue aprobado</h4>
-                <p>La mayoría de los revisores ha emitido un dictamen negativo. Por favor, revisa los comentarios y sube una nueva versión.</p>
-                <a href="/CPT/pages/protocolo_form.php" class="btn-reupload">
-                    <i class="fas fa-upload"></i> Subir Protocolo Corregido
-                </a>
+                <p>La mayoría de los revisores ha emitido un dictamen negativo. Por favor, revisa los comentarios y prepara tu nueva versión.</p>
+                ${reuploadActionHtml}
             </div>
         </div>
       `;
   } else if (project.status === "APPROVED") {
+    let finalUploadActionHtml = "";
+
+    // Verificamos si la etapa de subir documento final está activa en el calendario
+    if (isFinalUploadStageActive) {
+        finalUploadActionHtml = `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #bbf7d0;">
+                <p style="color: #166534; font-weight: 600; margin-bottom: 10px; font-size: 0.95em;">
+                    El periodo para subir tu Trabajo Terminal Final está abierto.
+                </p>
+                <a href="/CPT/pages/documento_final_form.php" class="btn-primary" style="background-color: #16a34a; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 0.9em;">
+                    <i class="fas fa-file-upload"></i> Subir Documento Final
+                </a>
+            </div>
+        `;
+    } else {
+        finalUploadActionHtml = `
+            <div style="margin-top: 15px; padding: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; color: #475569; font-size: 0.85em;">
+                <i class="fas fa-clock"></i> <strong>Periodo Cerrado:</strong> Aún no inicia el periodo para subir el Trabajo Terminal final. Mantente atento al calendario.
+            </div>
+        `;
+    }
+
     mainAlertHtml = `
         <div class="approved-alert">
             <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
             <div class="alert-content">
                 <h4>¡Felicidades! Protocolo Aprobado</h4>
-                <p>Tu proyecto ha cumplido con los criterios de evaluación. Ya puedes continuar con la siguiente etapa de tu Trabajo Terminal.</p>
+                <p>Tu proyecto ha cumplido con los criterios de evaluación. Ya puedes continuar con el desarrollo de tu Trabajo Terminal.</p>
+                ${finalUploadActionHtml}
             </div>
         </div>
       `;
@@ -88,23 +148,17 @@ function renderProjectStatus(container, data) {
 
   const reviewsHtml = reviews.length
     ? reviews.map((r) => {
-      // Determinar estado individual
-      let decisionHtml =
-        `<span class="review-decision decision-waiting">Pendiente</span>`;
-      let commentHtml =
-        `<span style="color:#94a3b8">Esperando revisión...</span>`;
+      let decisionHtml = `<span class="review-decision decision-waiting">Pendiente</span>`;
+      let commentHtml = `<span style="color:#94a3b8">Esperando revisión...</span>`;
       let pdfBtn = "";
 
-      // Si hay comentario (asumimos que ya revisó)
       if (r.grade !== null) {
         const isApproved = parseInt(r.grade) >= 1;
         decisionHtml = isApproved
           ? `<span class="review-decision decision-approved"><i class="fas fa-check"></i> Aprobado</span>`
           : `<span class="review-decision decision-rejected"><i class="fas fa-times"></i> No Aprobado</span>`;
 
-        commentHtml = r.comment
-          ? `"${escapeHtml(r.comment)}"`
-          : "Sin comentarios adicionales.";
+        commentHtml = r.comment ? `"${escapeHtml(r.comment)}"` : "Sin comentarios adicionales.";
 
         if (r.reviewer_pdf_url) {
           pdfBtn = `
