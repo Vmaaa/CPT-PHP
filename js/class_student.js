@@ -1,5 +1,6 @@
 CLASS_API_URL = API_URL + "/class/";
 CLASS_ASSIGNMENT_API_URL = API_URL + "/class/assigment/";
+CLASS_ASSIGMENT_SUBMISSION_API_URL = CLASS_ASSIGNMENT_API_URL + "submission/";
 STUDENTS_API_URL = API_URL + "/student/";
 CLASS_STUDENTS_API_URL = API_URL + "/class/student/";
 
@@ -149,7 +150,7 @@ function renderAssignmentDetail(assignment) {
         </div>
         <p><strong>Feedback del profesor:</strong><br/>${assignment.submissions[0].feedback || "Sin comentarios"}</p>
         <iframe src="${assignment.submissions[0].file_url}" loading="lazy"></iframe>`
-      : `<p>No hay archivo asociado</p>`}
+      : `<p>No has subido aún una entrega</p>`}
       </div>
 
     </div>
@@ -172,5 +173,76 @@ function sendAssignment(assigment) {
   : "Sube tu archivo para enviar tu entrega. Asegúrate de que el archivo cumpla con los requisitos especificados por tu profesor.";
 
   document.getElementById("submission-feedback").innerText = feedbackText;
+  document.getElementById("upload-submission-assignment-id").value = assigment.submissions.length > 0 ? assigment.submissions[0].id_assigment_submission : "";
   openModal("modal-upload-submission-file");
+}
+
+function closeUploadSubmissionFileModal() {
+  closeModal("modal-upload-submission-file");
+}
+
+async function uploadSubmissionFile() {
+  const fileInput = document.getElementById("submission-file");
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    SwalMessage({
+      title: "Error",
+      text: "Por favor, selecciona un archivo para subir.",
+      icon: "error",
+    });
+    return;
+  }
+
+  //pdf validation
+  if (file.type !== "application/pdf") {
+    SwalMessage({
+      title: "Error",
+      text: "Solo se permiten archivos PDF.",
+      icon: "error",
+    });
+    return;
+  }
+  
+  // Tamaño máximo de 5mb
+  if (file.size > 5 * 1024 * 1024) {
+    SwalMessage({
+      title: "Error",
+      text: "El archivo no puede superar los 5MB.",
+      icon: "error",
+    });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("id_assigment_submission", document.getElementById("upload-submission-assignment-id").value);
+
+  const response = await CookieManager.fetchWithAuth(
+    CLASS_ASSIGMENT_SUBMISSION_API_URL,
+    {
+      method: "PUT",
+      body: formData,
+    },
+  );
+  
+  if (!response.ok) {
+    SwalMessage({
+      title: "Error",
+      text: "Hubo un error al subir tu entrega. Por favor, inténtalo de nuevo.",
+      icon: "error",
+    });
+    return;
+  }
+  
+  SwalMessage({
+    title: "Éxito",
+    text: "Tu entrega ha sido subida correctamente.",
+    icon: "success",
+  });
+
+  // Recargamos los detalles de la clase para actualizar el estado de la entrega
+  await loadAccountClass();
+  closeUploadSubmissionFileModal();
+
 }

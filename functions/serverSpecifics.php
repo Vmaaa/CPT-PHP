@@ -31,6 +31,8 @@ class ServerSpecifics
     'second_grade_documents' => 'Segunda fase de calificar trabajos',
   ];
 
+  protected $uploadDir = __DIR__ . '/../uploads';
+
   private static $instance = null;
 
   private function __construct()
@@ -99,5 +101,10 @@ class ServerSpecifics
   function fnt_getStagesKeys(): array
   {
     return array_keys($this->stages);
+  }
+
+  function fnt_getUploadDir(): string
+  {
+    return $this->uploadDir;
   }
 }

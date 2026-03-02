@@ -373,12 +373,12 @@
     </div>
 
     <div class="modal-footer">
-      <button type="submit" class="btn btn-primary" form="upload-submission-file-form">
-        Subir
-      </button>
       <button class="btn btn-secondary"
         onclick="closeUploadSubmissionFileModal()">
         Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" onclick="uploadSubmissionFile()">
+        Subir
       </button>
     </div>
   </div>

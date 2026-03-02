@@ -13,7 +13,7 @@ require_once __DIR__ . "/../../../../../config/cors.php";
 require_once __DIR__ . "/../../../../../utils/token/pre_validate.php";
 require_once __DIR__ . "/../../../../../utils/input/input_parser.php";
 
-$UPLOAD_DIR = realpath(__DIR__ . '/../../../../../uploads/assigments');
+$UPLOAD_DIR = realpath($SS->fnt_getUploadDir());
 if ($UPLOAD_DIR === false) {
   http_response_code(500);
   echo json_encode(['error' => 'Directorio base de uploads no encontrado']);
@@ -106,14 +106,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     exit;
   }
   $id_assigment_submission = (int) $_PUT['id_assigment_submission'];
-  $grade = isset($_PUT['grade']) ? (float) $_PUT['grade'] : null;
-  $feedback = isset($_PUT['feedback']) ? $_PUT['feedback'] : null;
   $params = [];
   $types = '';
   $set_clauses = [];
   $now = date('Y-m-d H:i:s');
 
+
+  /* Obtener asignación actual */
+  $stmt = mysqli_prepare($DB_T, "SELECT a.*,asu.file_url as submission_file_url FROM assigment_submission as asu
+    INNER JOIN assigment a ON asu.id_assigment = a.id_assigment
+    WHERE asu.id_assigment_submission = ?");
+  mysqli_stmt_bind_param($stmt, 'i', $id_assigment_submission);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+
+  if (mysqli_num_rows($result) === 0) {
+    http_response_code(404);
+    echo json_encode(['error' => 'La asignación no existe']);
+    exit;
+  }
+
+  $assigment = mysqli_fetch_assoc($result);
+
   if ($AUTH['acco_role'] !== 'student') {
+    $required_fields = ['grade', 'feedback'];
+    $missing_fields = [];
+    foreach ($required_fields as $field) {
+      if (!isset($_PUT[$field])) {
+        $missing_fields[] = $field;
+      }
+    }
+
+    if (!empty($missing_fields)) {
+      http_response_code(400);
+      echo json_encode(['error' => 'Faltan campos requeridos: ' . implode(', ', $missing_fields)]);
+      exit;
+    }
+
+    $grade = isset($_PUT['grade']) ? (float) $_PUT['grade'] : null;
+    $feedback = isset($_PUT['feedback']) ? $_PUT['feedback'] : null;
     if ($grade !== null) {
       if (!is_numeric($grade) || $grade < 0 || $grade > 10) {
         http_response_code(400);
@@ -140,12 +171,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
       $params[] = $feedback;
     }
   } else {
-    //TODO: student logic
+    //student logic
+    $required_fields = ['file'];
+    $missing_fields = [];
+    foreach ($required_fields as $field) {
+      if (!isset($_PUT[$field])) {
+        $missing_fields[] = $field;
+      }
+    }
+    if (!empty($missing_fields)) {
+      http_response_code(400);
+      echo json_encode(['error' => 'Faltan campos requeridos: ' . implode(', ', $missing_fields)]);
+      exit;
+    }
+    $file = isset($_PUT['file']) ? $_PUT['file'] : null;
+    if ($file !== null) {
+      $tmpPath = tempnam(sys_get_temp_dir(), 'pdf_');
+      file_put_contents($tmpPath, $file);
+
+      if (!is_file($tmpPath) || filesize($tmpPath) === 0) {
+        unlink($tmpPath);
+        http_response_code(400);
+        echo json_encode(['error' => 'Error al subir el archivo']);
+        return;
+      }
+
+      if (filesize($tmpPath) > 5 * 1024 * 1024) {
+        unlink($tmpPath);
+        http_response_code(400);
+        echo json_encode(['error' => 'Archivo demasiado grande']);
+        return;
+      }
+
+      $file_name = uniqid('assignment_submission_', true) . '.pdf';
+
+      $file_path =
+        $UPLOAD_DIR
+        . '/class_' . $assigment['id_class']
+        . '/assignment_' . $assigment['id_assigment']
+        . '/submissions'
+        . '/' . $file_name;
+
+      $dir = dirname($file_path);
+
+      if (!is_dir($dir) && !mkdir($dir, 0755, true)) {
+        unlink($tmpPath);
+        http_response_code(500);
+        echo json_encode(['error' => 'Error al crear el directorio']);
+        return;
+      }
+
+      if (!rename($tmpPath, $file_path)) {
+        unlink($tmpPath);
+        http_response_code(500);
+        echo json_encode(['error' => 'Error al guardar el archivo']);
+        return;
+      }
+
+      $file_url = $API_URL . '/uploads/assigments/submissions/?' . http_build_query([
+        'file_name'    => $file_name,
+        'id_class'     => $assigment['id_class'],
+        'id_assigment' => $assigment['id_assigment']
+      ]);
+
+      $set_clauses[] = "file_url = ?";
+      $types .= 's';
+      $params[] = $file_url;
+
+
+      if ($assigment['file_url']) {
+        $parsed = parse_url($assigment['submission_file_url']);
+        parse_str($parsed['query'] ?? '', $q);
+        $old_file_path =
+          $UPLOAD_DIR
+          . '/class_' . $q['id_class']
+          . '/assignment_' . $q['id_assigment']
+          . '/submissions'
+          . '/' . ($q['file_name'] ?? '');
+        if (is_file($old_file_path)) {
+          unlink($old_file_path);
+        }
+      }
+
+      $set_clauses[] = "grade = NULL";
+
+      $set_clauses[] = "feedback = NULL";
+    }
   }
 
   if (empty($set_clauses)) {
     http_response_code(200);
-    echo json_encode(['changes' => [], 'auth' => $AUTH]);
+    echo json_encode(['changes' => []]);
     exit;
   }
 
@@ -157,7 +273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
   try {
     mysqli_stmt_execute($stmt);
     http_response_code(200);
-    echo json_encode(['changes' => $set_clauses]);
+    echo json_encode(['changes' => $set_clauses, 'q' => $q]);
   } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Error al actualizar la entrega: ' . $e->getMessage()]);
