@@ -350,6 +350,27 @@ function closeViewSubmissionModal() {
 }
 
 
+function openNewAssignmentModal(classId) {
+  const assignmentFeedback = "Puedes subir un archivo PDF de hasta 5MB como parte de la asignación, esto es opcional. Si decides subir un archivo, asegúrate de que esté en formato PDF y no exceda el límite de tamaño para evitar problemas al guardar la asignación.";
+  document.getElementById("assignment-modal-title").textContent =
+    "Nueva asignación";
+
+  document.getElementById("assignment-id").value = "";
+  document.getElementById("assignment-class-id").value = classId;
+  document.getElementById("assignment-title").value = "";
+  document.getElementById("assignment-description").value = "";
+  document.getElementById("assignment-due-date").value = "";
+  document.getElementById("assignment-file").value = "";
+  document.getElementById("delete-assignment-file-container").style.display =
+    "none";
+  document.getElementById("assignment-feedback").innerText = assignmentFeedback;
+  // Reset checkbox
+  document.getElementById("delete-assignment-file").checked = false;
+
+  window.openModal("modal-assignment");
+}
+
+
 function openEditAssignmentModal(assignment) {
   const assigmentFeedback = assignment.file_url ?
   "Ya subiste un archivo para esta asignación, si subes un nuevo archivo se reemplazará el anterior. Si quieres eliminar el archivo sin subir uno nuevo, marca la casilla de eliminar archivo y guarda los cambios"
