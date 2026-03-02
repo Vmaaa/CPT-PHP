@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   if (!file_exists($file_path) || !is_file($file_path)) {
     http_response_code(404);
-    echo json_encode(['error' => 'Archivo no encontrado']);
+    echo json_encode(['error' => 'Archivo no encontrado', 'file_path' => $file_path]);
     exit;
   }
 
