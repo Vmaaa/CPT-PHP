@@ -69,24 +69,19 @@ function renderProjectStatus(container, data) {
 
   const statusMap = {
     "PENDING": { text: "Pendiente de Asignación", class: "status-pending" },
-    "UNDER_REVIEW": {
-      text: "En Proceso de Revisión",
-      class: "status-under_review",
-    },
+    "UNDER_REVIEW": { text: "En Proceso de Revisión", class: "status-under_review" },
     "APPROVED": { text: "Protocolo Aprobado", class: "status-approved" },
-    "REJECTED": {
-      text: "No Aprobado / Requiere Correcciones",
-      class: "status-rejected",
-    },
+    "REJECTED": { text: "No Aprobado / Requiere Correcciones", class: "status-rejected" },
+    "FINAL_UNDER_REVIEW": { text: "En Revisión Final", class: "status-under_review" }, // <-- NUEVO
+    "READY_TO_PRESENT": { text: "Listo para Presentar", class: "status-approved" }    // <-- NUEVO
   };
+  
   const st = statusMap[project.status] || { text: project.status, class: "status-pending" };
 
   let mainAlertHtml = "";
 
   if (project.status === "REJECTED") {
-    // --- NUEVO: Lógica para mostrar u ocultar el botón de segunda subida ---
     let reuploadActionHtml = "";
-    
     if (isSecondUploadStageActive) {
         reuploadActionHtml = `
             <a href="/CPT/pages/protocolo_form.php" class="btn-reupload">
@@ -113,8 +108,6 @@ function renderProjectStatus(container, data) {
       `;
   } else if (project.status === "APPROVED") {
     let finalUploadActionHtml = "";
-
-    // Verificamos si la etapa de subir documento final está activa en el calendario
     if (isFinalUploadStageActive) {
         finalUploadActionHtml = `
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #bbf7d0;">
@@ -144,7 +137,22 @@ function renderProjectStatus(container, data) {
             </div>
         </div>
       `;
+  } 
+  else if (project.status === "FINAL_UNDER_REVIEW") {
+      mainAlertHtml = `
+        <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 15px;">
+            <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.5rem; margin-top: 2px;"></i>
+            <div>
+                <h4 style="color: #1e3a8a; margin: 0 0 5px 0;">Documento en Revisión</h4>
+                <p style="color: #1e40af; margin: 0; font-size: 0.9em;">Tu documento final está siendo evaluado por el jurado para determinar si está listo para ser presentado.</p>
+            </div>
+        </div>
+      `;
   }
+
+  const isFinalPhase = ["FINAL_UNDER_REVIEW", "READY_TO_PRESENT"].includes(project.status);
+  const textApproved = isFinalPhase ? "Presentar" : "Aprobado";
+  const textRejected = isFinalPhase ? "No Presentar" : "No Aprobado";
 
   const reviewsHtml = reviews.length
     ? reviews.map((r) => {
@@ -154,9 +162,10 @@ function renderProjectStatus(container, data) {
 
       if (r.grade !== null) {
         const isApproved = parseInt(r.grade) >= 1;
+        
         decisionHtml = isApproved
-          ? `<span class="review-decision decision-approved"><i class="fas fa-check"></i> Aprobado</span>`
-          : `<span class="review-decision decision-rejected"><i class="fas fa-times"></i> No Aprobado</span>`;
+          ? `<span class="review-decision decision-approved"><i class="fas fa-check"></i> ${textApproved}</span>`
+          : `<span class="review-decision decision-rejected"><i class="fas fa-times"></i> ${textRejected}</span>`;
 
         commentHtml = r.comment ? `"${escapeHtml(r.comment)}"` : "Sin comentarios adicionales.";
 

@@ -1,5 +1,5 @@
 const STATUS_API_URL = API_URL + "/student/status";
-const FINAL_DOCUMENT_API = API_URL + "/student/final_document/"; 
+const FINAL_DOCUMENT_API = API_URL + "/student/final_doc/"; 
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadProjectSummary();
@@ -63,7 +63,7 @@ async function submitFinalDocument(e) {
 
   Swal.fire({
     title: "¿Enviar Documento Final?",
-    text: "Vas a enviar la versión definitiva para la evaluación del jurado. ¿Estás seguro?",
+    text: "Vas a enviar la versión definitiva para la revisión del jurado. ¿Estás seguro?",
     icon: "question",
     showCancelButton: true,
     confirmButtonColor: "#16a34a",

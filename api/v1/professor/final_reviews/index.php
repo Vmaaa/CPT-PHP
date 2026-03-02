@@ -9,7 +9,6 @@ require_once dirname(__DIR__, 4) . "/functions/serverSpecifics.php";
 $DB = ServerSpecifics::getInstance()->fnt_getDBConnection();
 
 try {
-
   $sql = "
     SELECT
       fp.id_final_project,
@@ -44,8 +43,9 @@ try {
     JOIN fp_student fs ON fs.id_final_project = fp.id_final_project
     JOIN career c ON c.id_career = fp.id_career
     
+    /* AQUI ESTA LA MAGIA: Solo traemos los que están en la fase final */
     WHERE p.acco_id = ? 
-      AND fp.status NOT IN ('FINAL_UNDER_REVIEW', 'READY_TO_PRESENT')
+      AND fp.status IN ('FINAL_UNDER_REVIEW', 'READY_TO_PRESENT')
     ORDER BY fc.created_at DESC
   ";
 
@@ -60,13 +60,8 @@ try {
     $data[] = $row;
   }
 
-  echo json_encode([
-    'success' => true,
-    'data' => $data
-  ]);
+  echo json_encode(['success' => true, 'data' => $data]);
 } catch (Exception $e) {
   http_response_code(500);
-  echo json_encode([
-    'error' => $e->getMessage()
-  ]);
+  echo json_encode(['error' => $e->getMessage()]);
 }

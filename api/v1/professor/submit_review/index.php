@@ -54,18 +54,19 @@ try {
     $reviewerPdfUrl = $webBasePath . "/" . $fileName;
   }
 
+  // Traducción a binario: APPROVED (Aprobado/Presentar) = 1, REJECTED (Rechazado/No Presentar) = 0
   $grade = ($decision === 'APPROVED') ? 1 : 0;
 
   if ($reviewerPdfUrl) {
     $sql = "UPDATE fp_change_review 
-                SET grade = ?, comment = ?, reviewer_pdf_url = ? 
-                WHERE id_fp_change_review = ? AND id_professor = ?";
+            SET grade = ?, comment = ?, reviewer_pdf_url = ? 
+            WHERE id_fp_change_review = ? AND id_professor = ?";
     $stmt = $DB->prepare($sql);
     $stmt->bind_param("issii", $grade, $comments, $reviewerPdfUrl, $reviewId, $idProfessor);
   } else {
     $sql = "UPDATE fp_change_review 
-                SET grade = ?, comment = ? 
-                WHERE id_fp_change_review = ? AND id_professor = ?";
+            SET grade = ?, comment = ? 
+            WHERE id_fp_change_review = ? AND id_professor = ?";
     $stmt = $DB->prepare($sql);
     $stmt->bind_param("isii", $grade, $comments, $reviewId, $idProfessor);
   }
@@ -76,7 +77,7 @@ try {
     throw new Exception("No se encontró la revisión o no tienes permiso para modificarla.");
   }
 
-  echo json_encode(['success' => true, 'pdf_url' => $reviewerPdfUrl]);
+  // --- HASTA AQUÍ SE GUARDA LA REVISIÓN INDIVIDUAL. AHORA HACEMOS EL CONTEO GLOBAL ---
 
   $stmtId = $DB->prepare("SELECT id_fp_change FROM fp_change_review WHERE id_fp_change_review = ?");
   $stmtId->bind_param("i", $reviewId);
@@ -84,8 +85,8 @@ try {
   $rowChange = $stmtId->get_result()->fetch_assoc();
   $idFpChange = $rowChange['id_fp_change'];
 
-  // 2. Contar los votos de todos los revisores de este cambio
-  $stmtVotes = $DB->prepare("SELECT grade, comment FROM fp_change_review WHERE id_fp_change = ?");
+  // 1. Contar los votos de todos los revisores de este cambio
+  $stmtVotes = $DB->prepare("SELECT grade FROM fp_change_review WHERE id_fp_change = ?");
   $stmtVotes->bind_param("i", $idFpChange);
   $stmtVotes->execute();
   $resVotes = $stmtVotes->get_result();
@@ -103,17 +104,32 @@ try {
   }
 
   if ($completedReviews === 3) {
-    $finalStatus = ($votesApproved >= 2) ? 'APPROVED' : 'REJECTED';
 
-    // Actualizamos la tabla principal (final_project)
-    $stmtFinal = $DB->prepare("
-          UPDATE final_project 
-          SET status = ? 
-          WHERE id_final_project = (SELECT id_final_project FROM fp_change WHERE id_fp_change = ?)
-      ");
-    $stmtFinal->bind_param("si", $finalStatus, $idFpChange);
+    $stmtStatus = $DB->prepare("
+      SELECT p.status, p.id_final_project 
+      FROM final_project p
+      JOIN fp_change fc ON p.id_final_project = fc.id_final_project
+      WHERE fc.id_fp_change = ?
+    ");
+    $stmtStatus->bind_param("i", $idFpChange);
+    $stmtStatus->execute();
+    $projectInfo = $stmtStatus->get_result()->fetch_assoc();
+
+    $currentStatus = $projectInfo['status'];
+    $idFinalProject = $projectInfo['id_final_project'];
+
+    if ($currentStatus === 'FINAL_UNDER_REVIEW') {
+      $finalStatus = ($votesApproved >= 2) ? 'READY_TO_PRESENT' : 'FINAL_REJECTED';
+    } else {
+      $finalStatus = ($votesApproved >= 2) ? 'APPROVED' : 'REJECTED';
+    }
+
+    $stmtFinal = $DB->prepare("UPDATE final_project SET status = ? WHERE id_final_project = ?");
+    $stmtFinal->bind_param("si", $finalStatus, $idFinalProject);
     $stmtFinal->execute();
   }
+
+  echo json_encode(['success' => true, 'pdf_url' => $reviewerPdfUrl]);
 } catch (Exception $e) {
   http_response_code(500);
   echo json_encode(['error' => $e->getMessage()]);
