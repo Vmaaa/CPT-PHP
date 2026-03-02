@@ -13,7 +13,7 @@ require_once __DIR__ . "/../../../../config/cors.php";
 require_once __DIR__ . "/../../../../utils/token/pre_validate.php";
 require_once __DIR__ . "/../../../../utils/input/input_parser.php";
 
-$UPLOAD_DIR = realpath(__DIR__ . '/../../../../uploads/assigments');
+$UPLOAD_DIR = realpath($SS->fnt_getUploadDir());
 if ($UPLOAD_DIR === false) {
   http_response_code(500);
   echo json_encode(['error' => 'Directorio base de uploads no encontrado']);
@@ -126,9 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo json_encode(['error' => 'El archivo es demasiado grande: el tamaño máximo es de 5MB']);
       exit;
     }
-    //file path /uploads/assigments/{class_id}/{professor_id}/file_name
+    //file path /uploads/{class_id}/assignments/{professor_id}/{file_name}
     $file_name = uniqid('assignment_', true) . '.pdf';
-    $file_path = $UPLOAD_DIR . '/class_' . $id_class . '/professor_' . $id_professor . '/' . $file_name;
+    $file_path = $UPLOAD_DIR . '/class_' . $id_class . '/assignments/professor_' . $id_professor . '/' . $file_name;
     $file_dir = dirname($file_path);
     if (!is_dir($file_dir)) {
       $created = mkdir($file_dir, 0755, true);
@@ -285,10 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $file_name = uniqid('assignment_', true) . '.pdf';
 
     $file_path =
-      $UPLOAD_DIR
-      . '/class_' . $assigment['id_class']
-      . '/professor_' . $AUTH['id_professor']
-      . '/' . $file_name;
+      $UPLOAD_DIR . '/class_' . $assigment['id_class'] . '/assignments/professor_' . $AUTH['id_professor'] . '/' . $file_name;
 
     $dir = dirname($file_path);
 
@@ -327,11 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     parse_str($parsed['query'] ?? '', $q);
 
     if (isset($q['file_name'], $q['id_class'], $q['id_professor'])) {
-      $old_path = $UPLOAD_DIR
-        . '/class_' . $q['id_class']
-        . '/professor_' . $q['id_professor']
-        . '/' . $q['file_name'];
-
+      $old_path = $UPLOAD_DIR . '/class_' . $q['id_class'] . '/assignments/professor_' . $q['id_professor'] . '/' . $q['file_name'];
       if (file_exists($old_path)) {
         unlink($old_path);
       }
