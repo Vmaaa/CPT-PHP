@@ -23,7 +23,8 @@ try {
       ) AS student_name,
       
       fcr.id_fp_change_review,
-      fc.file_url,        
+      fc.file_url,
+      fc.presentation_url, 
       fcr.grade,
       fcr.comment,
       fcr.reviewer_pdf_url,
@@ -43,7 +44,7 @@ try {
     JOIN fp_student fs ON fs.id_final_project = fp.id_final_project
     JOIN career c ON c.id_career = fp.id_career
     
-    /* AQUI ESTA LA MAGIA: Solo traemos los que están en la fase final */
+    /* Solo traemos los que están en la fase final */
     WHERE p.acco_id = ? 
       AND fp.status IN ('FINAL_UNDER_REVIEW', 'READY_TO_PRESENT')
     ORDER BY fc.created_at DESC

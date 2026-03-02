@@ -4,6 +4,7 @@ const PROFESSORS_API = API_URL + "/professor/advisor";
 const ADMIN_PDF_API = API_URL + "/admin/pdf";
 
 let cachedProfessors = null;
+let currentAdvisors = []; 
 
 document.addEventListener("DOMContentLoaded", loadAdminProjects);
 
@@ -60,6 +61,8 @@ function renderAdminProjects(projects) {
       : "btn-action-primary";
     const statusInfo = statusMap[p.status] ||
       { text: p.status, class: "status-pending" };
+      
+    const advIds = p.advisors_ids || ""; 
 
     card.innerHTML = `
       <div class="project-header">
@@ -83,7 +86,7 @@ function renderAdminProjects(projects) {
                </button>`
         : "<span></span>"
     }
-        <button class="${btnClass}" onclick="openAssignModal(${p.id_final_project}, '${r1}', '${r2}', '${r3}')">
+        <button class="${btnClass}" onclick="openAssignModal(${p.id_final_project}, '${r1}', '${r2}', '${r3}', '${advIds}')">
           ${btnText}
         </button>
       </div>
@@ -109,8 +112,11 @@ function closePdfModal() {
   viewer.src = "";
 }
 
-async function openAssignModal(projectId, r1, r2, r3) {
+async function openAssignModal(projectId, r1, r2, r3, advIds) {
   document.getElementById("modal_project_id").value = projectId;
+  
+  currentAdvisors = advIds ? advIds.split(',') : [];
+
   const modal = document.getElementById("assignModal");
   modal.style.display = "flex";
 
@@ -180,9 +186,22 @@ function syncReviewerSelects() {
 
     [...select.options].forEach((opt) => {
       if (!opt.value) return;
-      opt.disabled = false;
-      if (values.includes(opt.value) && opt.value !== currentVal) {
-        opt.disabled = true;
+
+      // Limpiamos la etiqueta de asesor en caso de que cambie de proyecto
+      let baseText = opt.textContent.replace(" (Asesor)", "");
+      
+      // NUEVO: Verificamos si este profesor es asesor
+      if (currentAdvisors.includes(opt.value)) {
+          opt.disabled = true;
+          opt.textContent = baseText + " (Asesor)";
+      } else {
+          opt.textContent = baseText;
+          // Bloquear si ya lo seleccionó otro revisor (tu lógica original)
+          if (values.includes(opt.value) && opt.value !== currentVal) {
+            opt.disabled = true;
+          } else {
+            opt.disabled = false;
+          }
       }
     });
   });

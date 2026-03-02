@@ -55,8 +55,9 @@ async function submitFinalDocument(e) {
   const form = e.target;
   const data = new FormData(form);
   const fileInput = document.getElementById("final_file");
+  const presInput = document.getElementById("presentation_file");
 
-  if (fileInput.files.length === 0) {
+  if (fileInput.files.length === 0 || fileInput.files[0].type !== "application/pdf") {
     Swal.fire("Atención", "Debes seleccionar un archivo PDF.", "warning");
     return;
   }

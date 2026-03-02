@@ -40,7 +40,12 @@ try {
            WHERE id_final_project = fp.id_final_project 
            ORDER BY created_at DESC LIMIT 1
        )
-      ) as reviewers_ids
+      ) as reviewers_ids,
+
+      (SELECT GROUP_CONCAT(id_professor SEPARATOR ',')
+       FROM fp_advisor
+       WHERE id_final_project = fp.id_final_project
+      ) as advisors_ids
 
     FROM final_project fp
     JOIN fp_student fps ON fps.id_final_project = fp.id_final_project

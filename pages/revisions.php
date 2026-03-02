@@ -29,19 +29,24 @@ $pageScript = "revisions.js";
     </div>
   </div>
 
-  <div id="pdfModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content-pdf">
+
+  <div id="pdfModal" class="modal-overlay" style="display:none">
+    <div class="modal-card">
       <div class="modal-header">
-        <h2>Visor de PDF</h2>
-        <button class="btn-close-modal" onclick="closePdfModal()">&times;</button>
+        <h3 style="margin:0">Visualizador de Documentos</h3>
+        <button class="modal-close" onclick="closePdfModal()">×</button>
       </div>
-      <div class="modal-body-pdf">
-        <iframe id="pdfViewer" src="" frameborder="0"></iframe>
+      <div class="modal-body">
+        <iframe id="pdfViewer" src="" style="width:100%; height:100%; border:none;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closePdfModal()">Cerrar</button>
       </div>
     </div>
   </div>
 
   <?php require_once __DIR__ . '/../inc/inc_footer_scripts.php'; ?>
 </body>
+
 
 </html>

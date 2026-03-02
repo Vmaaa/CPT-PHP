@@ -32,20 +32,35 @@ $pageScript = "documento_final_form.js";
           <form id="final-document-form" enctype="multipart/form-data">
 
             <div class="form-section">
-              <h3><i class="fas fa-file-pdf"></i> Archivo del Documento</h3>
+              <h3><i class="fas fa-file-upload"></i> Archivos requeridos</h3>
+              <p style="color: #64748b; font-size: 0.9em; margin-bottom: 20px;">Sube tu documento escrito y el material de apoyo (diapositivas) para tu exposición.</p>
 
-              <div class="form-group">
-                <label for="final_file">Documento Final (PDF)</label>
-                <div class="file-input-wrapper">
-                  <input type="file" name="final_file" id="final_file" accept="application/pdf" required>
-                  <small>Formato PDF. Máximo 20 MB.</small>
+              <div class="row-two" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+                <div class="form-group">
+                  <label for="final_file">Documento Escrito (PDF)</label>
+                  <div class="file-input-wrapper" style="border: 2px dashed #cbd5e1; padding: 30px 15px; text-align: center; border-radius: 8px; background-color: #f8fafc;">
+                    <i class="fas fa-file-pdf" style="font-size: 2.5rem; color: #ef4444; margin-bottom: 10px;"></i><br>
+                    <input type="file" name="final_file" id="final_file" accept="application/pdf" required style="max-width: 100%;">
+                    <small style="display: block; margin-top: 5px;">Solo formato PDF. Máx 20 MB.</small>
+                  </div>
                 </div>
+
+                <div class="form-group">
+                  <label for="presentation_file">Presentación (PDF o PowerPoint)</label>
+                  <div class="file-input-wrapper" style="border: 2px dashed #cbd5e1; padding: 30px 15px; text-align: center; border-radius: 8px; background-color: #f8fafc;">
+                    <i class="fas fa-file-powerpoint" style="font-size: 2.5rem; color: #f97316; margin-bottom: 10px;"></i><br>
+                    <input type="file" name="presentation_file" id="presentation_file" accept=".pdf, .ppt, .pptx, application/pdf, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation" required style="max-width: 100%;">
+                    <small style="display: block; margin-top: 5px;">Formatos: .pdf, .ppt, .pptx. Máx 20 MB.</small>
+                  </div>
+                </div>
+
               </div>
             </div>
 
             <div class="form-actions" style="display: flex; justify-content: flex-end; align-items: center;">
               <button type="submit" class="btn-submit">
-                Enviar Documento
+                Enviar Documentos
               </button>
             </div>
 

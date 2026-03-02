@@ -1,5 +1,5 @@
 const PROFESSOR_FINAL_PROJECTS_API = API_URL + "/professor/final_reviews";
-const SUBMIT_REVIEW_API = API_URL + "/professor/submit_review/"; // Reciclamos tu endpoint actual
+const SUBMIT_REVIEW_API = API_URL + "/professor/submit_review/"; 
 const PROFESSOR_PDF_API = API_URL + "/admin/pdf";
 
 document.addEventListener("DOMContentLoaded", loadProfessorFinalProjects);
@@ -48,6 +48,16 @@ async function loadProfessorFinalProjects() {
       const disabledAttr = isReviewed ? "disabled" : "";
       const bgFooter = isReviewed ? "background-color:#f0fdf4;" : "";
 
+      // Botón para la presentación si existe la URL
+      let presentationBtn = "";
+      if (p.presentation_url) {
+          presentationBtn = `
+              <button type="button" class="btn-view-pdf-icon" style="background-color: #f97316; border: none; color: white; margin-top: 5px;" onclick="window.openDocModal('${p.presentation_url}', 'Presentación del Trabajo Terminal')">
+                  <i class="fas fa-file-powerpoint"></i> Ver Presentación
+              </button>
+          `;
+      }
+
       card.innerHTML = `
           <div class="card-header">
              <div style="display:flex; align-items:center; gap:10px;">
@@ -58,16 +68,19 @@ async function loadProfessorFinalProjects() {
           </div>
 
           <div class="card-body">
-             <div class="student-row">
+             <div class="student-row" style="align-items: flex-start;">
                 <div>
                    <small style="color: #64748b; font-weight: 600;">Equipo:</small><br>
                    <strong>${escapeHtml(p.student_name)}</strong>
                    <br><small style="color: #64748b;">${escapeHtml(p.career)}</small>
                 </div>
                 
-                <button type="button" class="btn-view-pdf-icon" onclick="window.openPdfModal('${p.id_final_project}')">
-                    <i class="fas fa-eye"></i> Ver PDF Final
-                </button>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button type="button" class="btn-view-pdf-icon" onclick="window.openDocModal('${PROFESSOR_PDF_API}?id=${p.id_final_project}', 'Documento Final PDF')">
+                        <i class="fas fa-file-pdf"></i> Ver PDF Final
+                    </button>
+                    ${presentationBtn}
+                </div>
              </div>
           </div>
 
@@ -77,8 +90,8 @@ async function loadProfessorFinalProjects() {
                     <label class="form-label">Veredicto del Jurado</label>
                     <select id="decision_${p.id_fp_change_review}" class="form-select" ${disabledAttr}>
                       <option value="">Selecciona...</option>
-                      <option value="APPROVED" ${prevDecision === "APPROVED" ? "selected" : ""}>Presentar</option>
-                      <option value="REJECTED" ${prevDecision === "REJECTED" ? "selected" : ""}>No Presentar</option>
+                      <option value="APPROVED" ${prevDecision === "APPROVED" ? "selected" : ""}>Presentar (Liberado)</option>
+                      <option value="REJECTED" ${prevDecision === "REJECTED" ? "selected" : ""}>No Presentar (Corregir)</option>
                     </select>
                  </div>
                  <div>
@@ -156,17 +169,20 @@ async function submitReview(id) {
     if (!res.ok) throw new Error(data.error || "Error");
 
     await Swal.fire("Éxito", "Veredicto registrado", "success");
-    loadProfessorFinalProjects(); 
+    loadProfessorFinalProjects(); // Recargar la vista
   } catch (err) {
     Swal.fire("Error", err.message, "error");
   }
 }
 
-window.openPdfModal = function (projectId) {
+window.openDocModal = function (url, title) {
   const modal = document.getElementById("pdfModal");
   const viewer = document.getElementById("pdfViewer");
+  const titleEl = document.getElementById("pdfModalTitle");
+
   if (modal && viewer) {
-    viewer.src = `${PROFESSOR_PDF_API}?id=${projectId}`;
+    if (titleEl) titleEl.innerText = title;
+    viewer.src = url;
     modal.style.display = "flex";
   }
 };

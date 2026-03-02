@@ -33,7 +33,7 @@ $pageScript = "projects_professor.js";
   <div id="pdfModal" class="modal-overlay" style="display:none">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 style="margin:0">Visualización de Protocolo</h3>
+        <h3 style="margin:0">Visualización</h3>
         <button class="modal-close" onclick="closePdfModal()">×</button>
       </div>
       <div class="modal-body">

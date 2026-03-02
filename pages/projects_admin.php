@@ -80,7 +80,7 @@ $pageScript = "projects_admin.js";
     <div class="modal-card" style="width: 85%; height: 90vh; max-width: 1000px; display:flex; flex-direction:column; padding:0;">
 
       <div class="modal-header" style="padding: 15px 20px; border-bottom:1px solid #eee;">
-        <h3 style="margin:0;">Visualización de Protocolo</h3>
+        <h3 style="margin:0;">Visualización</h3>
         <button class="modal-close" onclick="closePdfModal()">×</button>
       </div>
 
