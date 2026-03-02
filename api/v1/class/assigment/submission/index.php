@@ -88,6 +88,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if ($AUTH['acco_role'] !== 'student') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Solo los estudiantes pueden crear entregas']);
+    exit;
+  }
+  $file = isset($_FILES['file']) ? $_FILES['file'] : null;
+  $id_assigment = isset($_POST['id_assigment']) ? (int) $_POST['id_assigment'] : null;
+  $required_fields = ['file', 'id_assigment'];
+  $missing_fields = [];
+  foreach ($required_fields as $field) {
+    if (!isset($_POST[$field]) && !isset($_FILES[$field])) {
+      $missing_fields[] = $field;
+    }
+  }
+
+  $query_assigment = "SELECT * FROM assigment WHERE id_assigment = ?";
+  $stmt_assigment = mysqli_prepare($DB_T, $query_assigment);
+  mysqli_stmt_bind_param($stmt_assigment, 'i', $id_assigment);
+  mysqli_stmt_execute($stmt_assigment);
+  $result_assigment = mysqli_stmt_get_result($stmt_assigment);
+  if (mysqli_num_rows($result_assigment) === 0) {
+    http_response_code(404);
+    echo json_encode(['error' => 'La asignación no existe']);
+    exit;
+  }
+
+  $assigment = mysqli_fetch_assoc($result_assigment);
+
+  if (!empty($missing_fields)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Faltan campos requeridos: ' . implode(', ', $missing_fields)]);
+    exit;
+  }
+  if ($file['error'] !== UPLOAD_ERR_OK) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Error al subir el archivo']);
+    exit;
+  }
+  if ($file['size'] > 5 * 1024 * 1024) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Archivo demasiado grande']);
+    exit;
+  }
+  if ($file['type'] !== 'application/pdf') {
+    http_response_code(400);
+    echo json_encode(['error' => 'Archivo debe ser un PDF']);
+    exit;
+  }
+  $file_name = uniqid('assignment_submission_', true) . '.pdf';
+  $file_path = $UPLOAD_DIR . '/class_' . $assigment['id_class'] . '/assignments/professor_' . $assigment['id_professor'] . '/submissions/' . $file_name;
+  $dir = dirname($file_path);
+  if (!is_dir($dir) && !mkdir(
+    $dir,
+    0755,
+    true
+  )) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al crear el directorio']);
+    exit;
+  }
+  if (!move_uploaded_file($file['tmp_name'], $file_path)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al guardar el archivo']);
+    exit;
+  }
+  $file_url = $API_URL . '/uploads/assigments/submissions/?' . http_build_query([
+    'file_name'    => $file_name,
+    'id_class'     => $assigment['id_class'],
+    'id_professor' => $assigment['id_professor']
+  ]);
+
+  $query = "INSERT INTO assigment_submission (id_assigment, acco_id, file_url) VALUES (?, ?, ?)";
+  $stmt = mysqli_prepare($DB_T, $query);
+  mysqli_stmt_bind_param($stmt, 'iis', $id_assigment, $AUTH['acco_id'], $file_url);
+  try {
+    mysqli_stmt_execute($stmt);
+    http_response_code(201);
+    echo json_encode(['message' => 'Entrega creada exitosamente']);
+  } catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al crear la entrega']);
+    exit;
+  }
 }
 
 // professor can only update the grade and feedback, while students can only update the file, and this delete the grade

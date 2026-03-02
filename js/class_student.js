@@ -174,6 +174,7 @@ function sendAssignment(assigment) {
 
   document.getElementById("submission-feedback").innerText = feedbackText;
   document.getElementById("upload-submission-assignment-id").value = assigment.submissions.length > 0 ? assigment.submissions[0].id_assigment_submission : "";
+  document.getElementById("upload-assignment-id").value = assigment.id_assigment;
   openModal("modal-upload-submission-file");
 }
 
@@ -214,14 +215,19 @@ async function uploadSubmissionFile() {
     return;
   }
 
+  const editing = !!document.getElementById("upload-submission-assignment-id").value;
+
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("id_assigment", document.getElementById("upload-assignment-id").value);
+  if (editing) {
   formData.append("id_assigment_submission", document.getElementById("upload-submission-assignment-id").value);
+  }
 
   const response = await CookieManager.fetchWithAuth(
     CLASS_ASSIGMENT_SUBMISSION_API_URL,
     {
-      method: "PUT",
+      method: editing ? "PUT" : "POST",
       body: formData,
     },
   );

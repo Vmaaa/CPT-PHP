@@ -361,6 +361,7 @@
     <div class="modal-body">
       <form id="upload-submission-file-form">
         <input type="hidden" id="upload-submission-assignment-id" />
+        <input type="hidden" id="upload-assignment-id" />
 
         <div class="form-group">
           <label for="submission-file">Archivo (PDF, máx 5 MB)</label>

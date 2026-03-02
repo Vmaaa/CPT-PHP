@@ -75,12 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
   mysqli_stmt_execute($stmt);
   $result = mysqli_stmt_get_result($stmt);
+  $now = date('Y-m-d H:i:s');
   while ($row = mysqli_fetch_assoc($result)) {
     $row['humanized_stage'] = $stages[$row['stage']] ?? 'Desconocido';
     $row['active'] = false;
-    if ($row['start_date'] <= date('Y-m-d') && $row['end_date'] >= date('Y-m-d')) {
+    if ($row['start_date'] <= $now && $row['end_date'] >= $now) {
       $row['active'] = true;
     }
+    $row['now'] = $now;
     $events[] = $row;
   }
   echo json_encode(['data' => $events]);
