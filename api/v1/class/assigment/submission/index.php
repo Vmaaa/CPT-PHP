@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
       $file_path =
         $UPLOAD_DIR
         . '/class_' . $assigment['id_class']
-        . '/assignment_' . $assigment['id_assigment']
+        . '/assignments/professor_' . $assigment['id_professor']
         . '/submissions'
         . '/' . $file_name;
 
@@ -231,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
       $file_url = $API_URL . '/uploads/assigments/submissions/?' . http_build_query([
         'file_name'    => $file_name,
         'id_class'     => $assigment['id_class'],
-        'id_assigment' => $assigment['id_assigment']
+        'id_professor' => $assigment['id_professor']
       ]);
 
       $set_clauses[] = "file_url = ?";
@@ -245,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $old_file_path =
           $UPLOAD_DIR
           . '/class_' . $q['id_class']
-          . '/assignment_' . $q['id_assigment']
+          . '/assignments/professor_' . $assigment['id_professor']
           . '/submissions'
           . '/' . ($q['file_name'] ?? '');
         if (is_file($old_file_path)) {

@@ -13,7 +13,7 @@ require_once __DIR__ . "/../../../../config/cors.php";
 require_once __DIR__ . "/../../../../utils/token/pre_validate.php";
 require_once __DIR__ . "/../../../../utils/input/input_parser.php";
 
-$UPLOAD_DIR = realpath(__DIR__ . '/../../../../uploads/assigments');
+$UPLOAD_DIR = realpath($SS->fnt_getUploadDir());
 if ($UPLOAD_DIR === false) {
   http_response_code(500);
   echo json_encode(['error' => 'Directorio base de uploads no encontrado']);
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
   }
 
-  $file_path = $UPLOAD_DIR . '/class_' . $id_class . '/professor_' . $id_professor . '/' . $file_name;
+  $file_path = $UPLOAD_DIR . '/class_' . $id_class . '/assignments/professor_' . $id_professor . '/' . basename($file_name);
 
   if (!file_exists($file_path) || !is_file($file_path)) {
     http_response_code(404);

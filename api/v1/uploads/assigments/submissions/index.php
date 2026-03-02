@@ -23,19 +23,19 @@ if ($UPLOAD_DIR === false) {
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $file_name = $_GET['file_name'] ?? null;
   $id_class = $_GET['id_class'] ?? null;
-  $id_assignment = $_GET['id_assigment'] ?? null;
+  $id_professor = $_GET['id_professor'] ?? null;
 
-  if (!$file_name || !$id_class || !$id_assignment) {
+  if (!$file_name || !$id_class || !$id_professor) {
     http_response_code(400);
-    echo json_encode(['error' => 'Parámetros requeridos: file_name, id_class, id_assigment']);
+    echo json_encode(['error' => 'Parámetros requeridos: file_name, id_class, id_professor']);
     exit;
   }
 
-  $file_path = $UPLOAD_DIR . '/class_' . $id_class . '/assignment_' . $id_assignment . '/submissions/' . $file_name;
+  $file_path = $UPLOAD_DIR . '/class_' . $id_class . '/assignments/professor_' . $id_professor . '/submissions/' . basename($file_name);
 
   if (!file_exists($file_path) || !is_file($file_path)) {
     http_response_code(404);
-    echo json_encode(['error' => 'Archivo no encontrado']);
+    echo json_encode(['error' => 'Archivo no encontrado', 'file_path' => $file_path]);
     exit;
   }
 

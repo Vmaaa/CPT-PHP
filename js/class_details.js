@@ -313,10 +313,16 @@ function openViewSubmissionModal(submission) {
     submission.graded_at ? submission.graded_at : "Sin calificar";
 
   document.getElementById("view-submission-grade").value =
-    submission.grade ?? "Sin calificar";
+    submission.grade ?? "";
+
+  // Si no hay retroalimentación, mostrar un placeholder
+  document.getElementById("view-submission-grade").placeholder = "Sin calificar";
 
   document.getElementById("view-submission-feedback").value =
-    submission.feedback ?? "Sin retroalimentación";
+    submission.feedback ?? "";
+
+  // Si no hay retroalimentación, mostrar un placeholder
+  document.getElementById("view-submission-feedback").placeholder = "Sin retroalimentación";
 
   // Archiv
   if (submission.file_url) {
