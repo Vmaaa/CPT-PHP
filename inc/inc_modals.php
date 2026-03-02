@@ -294,3 +294,62 @@
     </div>
   </div>
 </div>
+<div id="modal-view-submission" class="modal-backdrop" style="display:none;">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="view-submission-title">Entrega de asignación</h3>
+      <button class="modal-close" onclick="closeViewSubmissionModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div>
+        <p><strong>Información de la entrega</strong></p>
+        <form id="view-submission-form">
+          <input type="hidden" id="view-submission-id" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="view-submission-date">Fecha de entrega</label>
+              <p id="view-submission-date"> </p>
+            </div>
+            <div class="form-group">
+              <label for="view-submission-rate-date">Fecha de la última calificación</label>
+              <p id="view-submission-rate-date"> </p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="view-submission-grade">Calificación</label>
+            <input type="number" id="view-submission-grade" min="0" max="10" step="0.1"
+              class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="view-submission-feedback">Retroalimentación</label>
+            <textarea id="view-submission-feedback" rows="5" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <div id="submission-students"></div>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="submission-preview">
+        <iframe id="submission-document"></iframe>
+      </div>
+
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" onclick="saveRateSubmission()">
+        Guardar cambios
+      </button>
+      <button class="btn btn-secondary"
+        onclick="closeViewSubmissionModal()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

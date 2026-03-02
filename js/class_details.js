@@ -1,5 +1,6 @@
 CLASS_API_URL = API_URL + "/class/";
 CLASS_ASSIGNMENT_API_URL = API_URL + "/class/assigment/";
+CLASS_ASSIGMENT_SUBMISSION_API_URL = CLASS_ASSIGNMENT_API_URL + "/submission/";
 STUDENTS_API_URL = API_URL + "/student/";
 CLASS_STUDENTS_API_URL = API_URL + "/class/student/";
 
@@ -198,67 +199,98 @@ function selectAssignment(idAssignment, el) {
 
   renderAssignmentDetail(assignment);
 }
+
 function renderAssignmentDetail(assignment) {
   const container = document.getElementById("assignment-detail");
-
   container.classList.remove("assignment-empty");
   container.classList.add("assignment-detail");
+  container.innerHTML = "";
 
-  container.innerHTML = `
-  <div class="name-with-action">
-    <h3>${assignment.title}</h3>
-    <button class="btn btn-primary" ${
-    assignment.can_be_edited ? "" : "disabled"
-  }>
-      <i class="fas fa-edit"></i> Editar Actividad</button>
-  </div>
+  // Name with action
+  const nameWithAction = document.createElement("div");
+  nameWithAction.className = "name-with-action";
 
-    <div class="assignment-detail-grid">
+  const title = document.createElement("h3");
+  title.textContent = assignment.title;
+  nameWithAction.appendChild(title);
 
-      <!-- COLUMNA IZQUIERDA -->
-      <div class="assignment-info">
-        <h3><strong>Datos de la actividad</strong></h3>
-        <p><strong>Descripción:</strong> ${assignment.description || "Sin descripción"}</p>
-
-        <p><strong>Fecha de entrega:</strong> ${assignment.due_date}</p>
-
-        <h4>Entregados</h4>
-        <ul class="delivered-list">
-          ${
-            assignment.submissions?.length
-              ? assignment.submissions
-                .map((s) => {
-                  const firstStudent = s.students[0];
-                  const firstName = firstStudent.name
-                    ? `${firstStudent.name} (${firstStudent.school_id_number})`
-                    : firstStudent.school_id_number;
-                  const extraCount = s.students.length > 1 ? ` y ${s.students.length - 1} más` : "";
-                  return `<li>Cuenta: ${s.acco_id} <br> ${firstName}${extraCount}</li>`;
-                })
-                .join("")
-              : "<li>Nadie ha entregado aún</li>"
-          }
-        </ul>
-      </div>
-
-      <!-- COLUMNA DERECHA -->
-      <div class="assignment-preview">
-        <h3><strong>Documento de la asignación</strong></h3>
-        ${
-    assignment.file_url
-      ? `<iframe src="${assignment.file_url}" loading="lazy"></iframe>`
-      : `<p>No hay archivo asociado</p>`
-  }
-      </div>
-
-    </div>
-  `;
-
-  const editButton = container.querySelector(".btn-primary");
+  const editButton = document.createElement("button");
+  editButton.className = "btn btn-primary";
+  if (!assignment.can_be_edited) editButton.disabled = true;
+  editButton.innerHTML = '<i class="fas fa-edit"></i> Editar Actividad';
   editButton.addEventListener("click", () => {
     openEditAssignmentModal(assignment);
   });
+  nameWithAction.appendChild(editButton);
+
+  container.appendChild(nameWithAction);
+
+  // Assignment detail grid
+  const detailGrid = document.createElement("div");
+  detailGrid.className = "assignment-detail-grid";
+
+  // Left column: assignment info
+  const infoCol = document.createElement("div");
+  infoCol.className = "assignment-info";
+  infoCol.innerHTML = `
+    <h3><strong>Datos de la actividad</strong></h3>
+    <p><strong>Descripción:</strong> ${assignment.description || "Sin descripción"}</p>
+    <p><strong>Fecha de límite de entrega:</strong> ${assignment.due_date}</p>
+    <h4>Entregados</h4>
+  `;
+
+  const deliveredList = document.createElement("ul");
+  deliveredList.className = "delivered-list";
+
+  if (assignment.submissions?.length) {
+    assignment.submissions.forEach((s) => {
+      const firstStudent = s.students[0];
+      const firstName = firstStudent.name
+        ? `(${firstStudent.school_id_number}) ${firstStudent.name}`
+        : firstStudent.school_id_number;
+      const extraCount = s.students.length > 1 ? ` y ${s.students.length - 1} más` : "";
+
+      const li = document.createElement("li");
+      li.setAttribute("data-assigment-submission-id", s.assigment_submission_id);
+      li.innerHTML = `Cuenta: ${s.acco_id} <br> ${firstName}${extraCount}`;
+      li.style.cursor = "pointer";
+      li.addEventListener("click", () => {
+        openViewSubmissionModal(s);
+      });
+      deliveredList.appendChild(li);
+    });
+  } else {
+    const li = document.createElement("li");
+    li.textContent = "Nadie ha entregado aún";
+    deliveredList.appendChild(li);
+  }
+
+  infoCol.appendChild(deliveredList);
+
+  // Right column: assignment preview
+  const previewCol = document.createElement("div");
+  previewCol.className = "assignment-preview";
+  const previewTitle = document.createElement("h3");
+  previewTitle.innerHTML = "<strong>Documento de la asignación</strong>";
+  previewCol.appendChild(previewTitle);
+
+  if (assignment.file_url) {
+    const iframe = document.createElement("iframe");
+    iframe.src = assignment.file_url;
+    iframe.loading = "lazy";
+    previewCol.appendChild(iframe);
+  } else {
+    const p = document.createElement("p");
+    p.textContent = "No hay archivo asociado";
+    previewCol.appendChild(p);
+  }
+
+  detailGrid.appendChild(infoCol);
+  detailGrid.appendChild(previewCol);
+
+  container.appendChild(detailGrid);
 }
+
 
 function renderClassDetails(classData) {
   renderClassInfo(classData);
@@ -267,24 +299,57 @@ function renderClassDetails(classData) {
   renderAssignments(classData.assigments, classData.id_class);
 }
 
-function openNewAssignmentModal(classId) {
-  document.getElementById("assignment-modal-title").textContent =
-    "Nueva asignación";
+function openViewSubmissionModal(submission) {
 
-  document.getElementById("assignment-id").value = "";
-  document.getElementById("assignment-class-id").value = classId;
-  document.getElementById("assignment-title").value = "";
-  document.getElementById("assignment-description").value = "";
-  document.getElementById("assignment-due-date").value = "";
-  document.getElementById("assignment-file").value = "";
-  document.getElementById("current-assignment-file").textContent = "";
-  document.getElementById("delete-assignment-file-container").style.display =
-    "none";
-  // Reset checkbox
-  document.getElementById("delete-assignment-file").checked = false;
+  document.getElementById("view-submission-title").textContent =
+    "Entrega de asignación";
 
-  window.openModal("modal-assignment");
+  document.getElementById("view-submission-id").value = submission.id_assigment_submission;
+
+  document.getElementById("view-submission-date").textContent =
+    submission.submitted_at || "";
+
+  document.getElementById("view-submission-rate-date").textContent =
+    submission.graded_at ? submission.graded_at : "Sin calificar";
+
+  document.getElementById("view-submission-grade").value =
+    submission.grade ?? "Sin calificar";
+
+  document.getElementById("view-submission-feedback").value =
+    submission.feedback ?? "Sin retroalimentación";
+
+  // Archiv
+  if (submission.file_url) {
+    //load iframe with file
+    document.getElementById("submission-document").src = submission.file_url;
+  }
+
+
+  // Estudiantes
+  const studentsDiv = document.getElementById("submission-students");
+  studentsDiv.innerHTML = "";
+
+  submission.students.forEach((student, index) => {
+
+    const wrapper = document.createElement("div");
+
+    wrapper.innerHTML = `
+      <div class="form-group">
+        <label>Estudiante ${index+ 1}</label>
+        <p>(${student.school_id_number}) ${student.name}</p>
+      </div>
+    `;
+
+    studentsDiv.appendChild(wrapper);
+  });
+  openModal("modal-view-submission");
 }
+
+function closeViewSubmissionModal() {
+  closeModal("modal-view-submission");
+}
+
+
 function openEditAssignmentModal(assignment) {
   if (!assignment.can_be_edited) {
     SwalMessage({
@@ -324,6 +389,52 @@ function openEditAssignmentModal(assignment) {
 
   window.openModal("modal-assignment");
 }
+
+async function saveRateSubmission() {
+  const grade = document.getElementById("view-submission-grade").value;
+  const feedback = document.getElementById("view-submission-feedback").value;
+  const submissionId = document.getElementById("view-submission-id").value;
+  
+  const formData = new FormData();
+  formData.append("grade", grade);
+  formData.append("feedback", feedback);
+  formData.append("id_assigment_submission", submissionId);
+  
+  const response = await CookieManager.fetchWithAuth(
+    CLASS_ASSIGMENT_SUBMISSION_API_URL,
+    {
+      method: "PUT",
+      body: formData,
+    },
+  );
+
+  if (!response.ok) {
+    SwalMessage({
+      tile: "Error",
+      text: "Sucedió un error al calificar la entrega",
+      icon: "error",
+    });
+    return;
+  }
+  
+  SwalMessage({
+    tile: "Éxito",
+    text: "Entrega calificada correctamente",
+    icon: "success",
+  });
+  closeViewSubmissionModal();
+  //reload class details
+  const urlParams = new URLSearchParams(window.location.search);
+  const classIdParam = urlParams.get("id_class");
+  if (classIdParam) {
+    await loadSpecificClass(classIdParam);
+    document.getElementById("assignment-detail").innerHTML =
+      `<p class="assignment-empty">Seleccione una asignación para ver los detalles</p>`;
+
+  }
+
+}
+
 async function submitAssignment() {
   const id = document.getElementById("assignment-id").value;
   let editing = false;
