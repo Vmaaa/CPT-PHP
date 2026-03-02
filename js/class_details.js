@@ -351,6 +351,9 @@ function closeViewSubmissionModal() {
 
 
 function openEditAssignmentModal(assignment) {
+  const assigmentFeedback = assignment.file_url ?
+  "Ya subiste un archivo para esta asignación, si subes un nuevo archivo se reemplazará el anterior. Si quieres eliminar el archivo sin subir uno nuevo, marca la casilla de eliminar archivo y guarda los cambios"
+  : "No has subido un archivo para esta asignación, puedes subir uno nuevo o dejarlo sin archivo";
   if (!assignment.can_be_edited) {
     SwalMessage({
       tile: "Error",
@@ -376,16 +379,13 @@ function openEditAssignmentModal(assignment) {
 
   document.getElementById("assignment-file").value = "";
 
-  document.getElementById("current-assignment-file").textContent =
-    assignment.file_url
-      ? `Archivo actual: ${assignment.file_url.split("/").pop()}`
-      : "Sin archivo actual";
-
   document.getElementById("delete-assignment-file-container").style.display =
     assignment.file_url ? "block" : "none";
 
   // Reset checkbox
   document.getElementById("delete-assignment-file").checked = false;
+
+  document.getElementById("assignment-feedback").innerText = assigmentFeedback;
 
   window.openModal("modal-assignment");
 }

@@ -127,7 +127,7 @@ function renderAssignmentDetail(assignment) {
         <h3><strong>Datos de la actividad</strong></h3>
         <p><strong>Descripción:</strong> ${assignment.description || "Sin descripción"}</p>
 
-        <p><strong>Fecha de entrega:</strong> ${assignment.due_date}</p>
+        <p><strong>Fecha límite de entrega:</strong> ${assignment.due_date}</p>
 
           <div class="assignment-preview">
             ${
@@ -142,11 +142,12 @@ function renderAssignmentDetail(assignment) {
     ${assignment.submissions.length > 0 ? `
       <div class="submission-preview">
         <h3><strong>Tu entrega</strong></h3>
+        <p><strong>Fecha de entrega:</strong> ${assignment.submissions[0].submitted_at}</p>
+        <div class="form-row">
         <p><strong>Calificación:</strong> ${assignment.submissions[0].grade || "Sin calificar"}</p>
         <p><strong>Calificado el:</strong> ${assignment.submissions[0].graded_at || "Aún no calificado"}</p>
-        <p><strong>Comentarios del profesor:</strong> ${assignment.submissions[0].feedback || "Sin comentarios"}</p>
-        <p><strong>Fecha de entrega:</strong> ${assignment.submissions[0].submitted_at}</p>
-        <p><strong>Archivo entregado:</strong></p>
+        </div>
+        <p><strong>Feedback del profesor:</strong><br/>${assignment.submissions[0].feedback || "Sin comentarios"}</p>
         <iframe src="${assignment.submissions[0].file_url}" loading="lazy"></iframe>`
       : `<p>No hay archivo asociado</p>`}
       </div>
@@ -155,7 +156,7 @@ function renderAssignmentDetail(assignment) {
   `;
 
   const sendButton = container.querySelector(".btn-primary");
-  sendButton.addEventListener("click", () => sendAssignment(assignment.id_assigment));
+  sendButton.addEventListener("click", () => sendAssignment(assignment));
 }
 
 function renderClassDetails(classData) {
@@ -163,6 +164,13 @@ function renderClassDetails(classData) {
   renderAssignments(classData.assigments, classData.id_class);
 }
 
-function sendAssignment(idAssignment) {
-  console.log("Enviar actividad con ID:", idAssignment);
+function sendAssignment(assigment) {
+  const prevSubmission = assigment.submissions.length > 0 ? assigment.submissions[0] : null;
+  const feedbackText = prevSubmission ?
+  `Ya has enviado una entrega para esta actividad. Si deseas actualizar tu entrega, puedes subir un nuevo archivo.
+  Ten en cuenta que tu calificación, si es que existe, será reemplazada por la nueva entrega y el profesor tendrá que calificarla nuevamente.`
+  : "Sube tu archivo para enviar tu entrega. Asegúrate de que el archivo cumpla con los requisitos especificados por tu profesor.";
+
+  document.getElementById("submission-feedback").innerText = feedbackText;
+  openModal("modal-upload-submission-file");
 }

@@ -104,7 +104,6 @@
 
       <label>
         Archivo (PDF, máx 5 MB)
-        <span id="current-assignment-file" class="text-muted"></span>
       </label>
 
       <input
@@ -118,8 +117,7 @@
         <label for="delete-assignment-file">Eliminar archivo actual</label>
       </div>
 
-      <small class="text-muted" style="display:block; margin-top:8px;">
-        En edición, subir un archivo reemplazará el actual
+      <small class="text-muted" style="display:block; margin-top:8px;" id="assignment-feedback">
       </small>
     </div>
 
@@ -353,3 +351,34 @@
     </div>
   </div>
 </div>
+<div id="modal-upload-submission-file" class="modal-backdrop" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="upload-submission-file-title">Subir entrega</h3>
+      <button class="modal-close" onclick="closeUploadSubmissionFileModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form id="upload-submission-file-form">
+        <input type="hidden" id="upload-submission-assignment-id" />
+
+        <div class="form-group">
+          <label for="submission-file">Archivo (PDF, máx 5 MB)</label>
+          <input type="file" id="submission-file" class="form-control" accept="application/pdf" required />
+        </div>
+      </form>
+
+      <div class="text-muted" style="margin-top:8px;" id="submission-feedback">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" form="upload-submission-file-form">
+        Subir
+      </button>
+      <button class="btn btn-secondary"
+        onclick="closeUploadSubmissionFileModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
