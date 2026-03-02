@@ -130,14 +130,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['error' => 'El acco_id proporcionado no corresponde a una cuenta de estudiante']);
     exit;
   }
-  //retrieve id_career from the existing students associated with the account
-  $qry_get_career = "SELECT id_career FROM student WHERE acco_id = ? LIMIT 1";
+  //retrieve id_career,half semester and year from the existing students associated with the account
+  $qry_get_career = "SELECT id_career, first_half, year FROM student WHERE acco_id = ? LIMIT 1";
   $stmt_get_career = mysqli_prepare($DB_T, $qry_get_career);
   mysqli_stmt_bind_param($stmt_get_career, 'i', $acco_id);
   mysqli_stmt_execute($stmt_get_career);
   $res_get_career = mysqli_stmt_get_result($stmt_get_career);
   $row_get_career = mysqli_fetch_assoc($res_get_career);
   $id_career = $row_get_career['id_career'];
+  $first_half = $row_get_career['first_half'];
+  $year = $row_get_career['year'];
   mysqli_stmt_close($stmt_get_career);
   //retrieve id_class from the existing students associated with the account (if any)
   $qry_get_class = "SELECT id_class FROM student WHERE acco_id = ? LIMIT 1";
@@ -152,9 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   mysqli_stmt_close($stmt_get_class);
 
   //insert the new student
-  $qry_insert_student = "INSERT INTO student (acco_id, name, curp, school_id_number, id_career, id_class) VALUES (?, ?, ?, ?, ?, ?)";
+  $qry_insert_student = "INSERT INTO student (acco_id, name, curp, school_id_number, id_career, id_class, first_half, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
   $stmt_insert_student = mysqli_prepare($DB_T, $qry_insert_student);
-  mysqli_stmt_bind_param($stmt_insert_student, 'isssii', $acco_id, $name, $curp, $school_id_number, $id_career, $id_class);
+  mysqli_stmt_bind_param($stmt_insert_student, 'isssiiii', $acco_id, $name, $curp, $school_id_number, $id_career, $id_class, $first_half, $year);
   try {
     mysqli_stmt_execute($stmt_insert_student);
   } catch (Exception $e) {

@@ -13,6 +13,9 @@ $DB_T = $SS->fnt_getDBConnection();
 $WEBPAGE_T = $SS->fnt_getWebPageURL();
 $SERVER_URL_T = $SS->fnt_getAPIUrl();
 
+$first_half_semester_months = [1, 2, 3]; // january, february, march for first half of the semester
+$second_half_semester_months = [7, 8, 9]; // july, august, september for second half of the semester
+
 function releaseLock($db, $kEmail)
 {
   mysqli_query($db, "SELECT RELEASE_LOCK('" . mysqli_real_escape_string($db, $kEmail) . "')");
@@ -177,17 +180,24 @@ if ($acco_role === 'student') {
     echo json_encode(['error' => "El 'school_id_number' proporcionado no es válido"]);
     exit;
   }
-  $qry_insert_student = "INSERT INTO student (acco_id, name, curp, school_id_number, id_career)
-    VALUES (?, ?, ?, ?, ?)";
-  $stmt_insert_student = mysqli_prepare($DB_T, $qry_insert_student);
-  if (!$stmt_insert_student) {
+  $current_month = (int) date('m');
+  if (in_array($current_month, $first_half_semester_months, true)) {
+    $first_half = 1;
+  } elseif (in_array($current_month, $second_half_semester_months, true)) {
+    $first_half = 0;
+  } else {
     mysqli_rollback($DB_T);
     releaseLock($DB_T, $lockEmailKey);
-    http_response_code(500);
-    echo json_encode(['error' => 'Preparación de consulta fallida (insert student profile)']);
+    http_response_code(400);
+    echo json_encode(['error' => "No se puede registrar un estudiante fuera de los meses de inicio de semestre (enero-marzo o julio-septiembre)"]);
     exit;
   }
-  mysqli_stmt_bind_param($stmt_insert_student, 'isssi', $acco_id, $acco_name, $curp, $school_id_number, $id_career);
+
+  $year = date('Y');
+  $qry_insert_student = "INSERT INTO student (acco_id, name, curp, school_id_number, id_career, first_half, year)
+    VALUES (?, ?, ?, ?, ?, ?, ?)";
+  $stmt_insert_student = mysqli_prepare($DB_T, $qry_insert_student);
+  mysqli_stmt_bind_param($stmt_insert_student, 'isssiii', $acco_id, $acco_name, $curp, $school_id_number, $id_career, $first_half, $year);
   try {
     mysqli_stmt_execute($stmt_insert_student);
   } catch (Exception $e) {
