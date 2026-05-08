@@ -257,9 +257,3 @@ async function saveReviewers() {
     );
   }
 }
-
-function escapeHtml(text) {
-  return text
-    ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    : "";
-}
